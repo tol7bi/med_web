@@ -1,0 +1,91 @@
+{% extends 'diagnostics/base.html' %}
+
+
+
+{% block style %}
+  <style>
+    .navigation-buttons {
+      justify-content: flex-end;
+    }
+
+    /* Стили для выпадающего списка */
+    .language-dropdown {
+      position: absolute;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      z-index: 1;
+    }
+
+    .language-dropdown ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .language-dropdown li {
+      padding: 5px;
+    }
+
+    .language-dropdown li a {
+      text-decoration: none;
+      color: #333;
+    }
+
+    .language-dropdown li a:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Стили для текущего выбранного языка */
+    .language:hover #current-language {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="window.location.href='{% url 'index' %}'"><b>О проекте</b></div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'privacy' %}'">Условия использования</div>
+    </div>
+    <div class="main-content">
+      <div class="title-text">Пройдите диагностику своего состояния здоровья</div>
+      <div style="margin-bottom: 20px;">В результате вы получите: </div>
+      <div class="list">
+        <div class="list-item">- указания на серьезные симптомы,</div>
+        <div class="list-item">- предварительные наиболее вероятные диагнозы и состояния (в том числе возможные побочные
+          действия лекарств, вредных привычек, образа жизни, …),</div>
+        <div class="list-item">- список специалистов, консультирующих по найденным состояниям и сможете записаться на консультацию к выбранному специалисту.</div>
+      </div>
+      <div class="navigation-buttons">
+        <a class="button" onclick="window.location.href='{% url 'privacy' %}'">Далее</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    // JavaScript для отображения и скрытия выпадающего списка
+    var languageDropdown = document.getElementById("language-dropdown");
+
+    document.getElementById("current-language").addEventListener("click", function () {
+      console.log(11);
+      if (languageDropdown.style.display === "block") {
+        languageDropdown.style.display = "none";
+      } else {
+        languageDropdown.style.display = 'block';
+      }
+    });
+
+    // // Закрываем выпадающий список, если кликнули вне него
+    // document.addEventListener("click", function (event) {
+    //   if (!languageDropdown.contains(event.target)) {
+    //     languageDropdown.style.display = "none";
+    //   }
+    // });
+
+  </script>
+{% endblock %}

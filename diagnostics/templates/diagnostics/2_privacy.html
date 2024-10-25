@@ -1,0 +1,82 @@
+{% extends 'diagnostics/base.html' %}
+
+
+{% block style %}
+  <style>
+
+    .checkbox-list {
+      margin-bottom: 10px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+  </style>
+{% endblock %}
+
+
+{% block content %}
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="window.location.href='{% url 'index' %}'">О проекте</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'privacy' %}'"><b>Условия использования</b></div>
+    </div>
+    <div class="main-content">
+      <div class="title-text">Условия использования</div>
+      <div class="info-text">
+        Перед началом диагностики ознакомьтесь и примите Условия использования сервиса. Данное исследование не является
+        полноценной медицинской диагностикой. Оно предназначено для общего сведения и поиска наиболее подходящих врачей.
+        Это обследование не предназначено для экстренных случаев. В случае неотложного состояния немедленно позвоните в
+        скорую помощь.
+      </div>
+      <form action="{% url 'privacy' %}" method="post">
+        {% csrf_token %}
+        <div class="checkbox-list">
+          <div class="checkbox-item">
+            <input type="checkbox" id="terms" required>
+            <label for="terms">Я прочитал(а) и принимаю <a href="#" onclick="showRules()">Правила использования сайта.</a></label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="infoUsage" required>
+            <label for="infoUsage">Я соглашаюсь на использование переданной информации для проведения диагностики, изложенные в <a href="#" onclick="showPrivacy()">Политике конфиденциальности.</a></label>
+          </div>
+        </div>
+        <div class="navigation-buttons">
+          <a class="backbutton" onclick="window.location.href='{% url 'index' %}'">← Назад</a>
+          <button class="button" type="submit" id="privacy">
+            Далее
+          </button>
+        </div>
+      </form>
+      <!-- <div class="privacy-policy">
+        Дополнительная информация изложена в <a href="#">Политике конфиденциальности</a>.
+      </div> -->
+    </div>
+  </div>
+{% endblock %}
+  
+{% block script %}
+  <script>
+    // JavaScript для отображения и скрытия выпадающего списка
+    var languageDropdown = document.getElementById("language-dropdown");
+
+    document.getElementById("current-language").addEventListener("click", function () {
+      console.log(11);
+      if (languageDropdown.style.display === "block") {
+        languageDropdown.style.display = "none";
+      } else {
+        languageDropdown.style.display = 'block';
+      }
+    });
+
+    // // Закрываем выпадающий список, если кликнули вне него
+    // document.addEventListener("click", function (event) {
+    //   if (!languageDropdown.contains(event.target)) {
+    //     languageDropdown.style.display = "none";
+    //   }
+    // });
+
+  </script>
+{% endblock %}

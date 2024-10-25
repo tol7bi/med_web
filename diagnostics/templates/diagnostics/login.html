@@ -1,0 +1,57 @@
+{% extends 'diagnostics/base2.html' %}
+
+{% block content %}
+<form action="{% url 'login' %}" method="post" style="display: flex; flex-direction: column; align-items: center;">
+    {% csrf_token %}
+
+    {% if form.errors %}
+    <div style="color: red;">
+        {{ form.errors }}
+    </div>
+    {% endif %}
+    <div style="margin-top: 10%; margin-bottom: 10%;">
+        {% if messages or form.non_field_errors %}
+        {% if messages %}
+        {% for message in messages %}
+        <span style="color: red;">{{ message }}</span>
+        {% endfor %}
+        {% else %}
+        {{ form.non_field_errors }}
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <div>
+        <div>
+            <label for="{{ form.email.id_for_label }}">Email:</label>
+            {{ form.email }}
+        </div>
+        <div>
+            <label for="{{ form.password.id_for_label }}">Пароль:</label>
+            {{ form.password }}
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <a href="{% url 'registration' %}">Регистрация</a>
+            <button type="submit">Вход</button>
+        </div>
+    </div>
+
+
+</form>
+<div class="main-content" style="text-align: center;">
+    <h2>Общая информация для Специалиста</h2>
+    <p>
+        Если Вы являетесь врачом, другим медицинским или социальным работником, психологом, диетологом или иным
+        профессионалом, оказывающим свои услуги в сфере лечения, сохранения и укрепления здоровья, а также в
+        профилактике заболеваний, то можете получать заявки на свои услуги от пользователей этого сайта. Также можете
+        использовать этот сайт как дополнительный способ анализа данных пациента. Искусственный интеллект сайта
+        проанализирует данные пациента (физикальные показатели, симптомы, лабораторные данные, анамнез, принимаемые
+        лекарства, образ жизни, …) и выдаст наиболее вероятные диагнозы, укажет на наличие ургентных состояний, покажет
+        связь между имеющимися жалобами и отклонениями в лабораторных показателях с принимаемыми лекарствами, ранее
+        перенесенными заболеваниями и найдет другие неочевидные связи между симптомами и образом жизни пациента.
+    </p>
+    <p>
+        Для получения этих услуг необходимо <a href="{% url 'registration' %}">зарегистрироваться</a> (бесплатно).
+    </p>
+</div>
+{% endblock %}

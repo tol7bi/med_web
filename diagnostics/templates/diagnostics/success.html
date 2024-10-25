@@ -1,0 +1,34 @@
+{% extends 'diagnostics/base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="window.location.href='{% url 'general' %}'">Общие сведения</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'complaints' %}'">Жалобы</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'disease' %}'">Давность заболевания</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'medicines' %}'">Принимаемые лекарства</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'illnesses' %}'">Ранее перенесённые заболевания
+      </div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'operations' %}'">Ранее перенесённые операции
+      </div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'drug' %}'">Аллергия на лекарства</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'food' %}'">Аллергия на продукты питания и другие
+        вещества</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'habits' %}'">Вредные привычки</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'profession' %}'">Профессия</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'blood' %}'">Общий анализ крови</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'chem' %}'">Биохимический анализ крови</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'extra' %}'">Врач, процедура</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'data' %}'">Введенные данные</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'loading' %}'">Результат диагностики</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'success' %}'"><b>Выбранный врач</b></div>
+    </div>
+    <div class="content">
+        <p><b>{{ name.1|title }} свяжется с Вами в ближайшее время по указанному Вами способу.</b></p>
+        <div class="navigation-buttons">
+            <a class="backbutton" onclick="window.location.href='{% url 'contacts' %}'">← Назад</a>
+            <button class="button" type="button" onclick="showModal()">Начать новую диагностику</button>
+        </div>
+    </div>
+  </div>
+{% endblock %}

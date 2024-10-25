@@ -1,0 +1,150 @@
+{% extends 'diagnostics/base.html' %}
+
+
+{% block content %}
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="window.location.href='{% url 'general' %}'">Общие сведения</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'complaints' %}'">Жалобы</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'disease' %}'">Давность заболевания</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'medicines' %}'">Принимаемые лекарства</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'illnesses' %}'">Ранее перенесённые заболевания
+      </div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'operations' %}'">Ранее перенесённые операции
+      </div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'drug' %}'">Аллергия на лекарства</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'food' %}'">Аллергия на продукты питания и другие
+        вещества</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'habits' %}'">Вредные привычки</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'profession' %}'">Профессия</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'blood' %}'">Общий анализ крови</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'chem' %}'">Биохимический анализ крови</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'extra' %}'">Врач, процедура</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'data' %}'"><b>Введенные данные</b></div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'loading' %}'">Результат диагностики</div>
+      {% if doctor %}
+        <div class="sidebar-item" onclick="window.location.href='{% url 'success' %}'">Выбранный врач</div>
+      {% else %}
+        <div class="sidebar-item" onclick="window.location.href='{% url 'loading' %}'">Выбранный врач</div>
+      {% endif %}
+    </div>
+    <div class="main-content">
+
+      <div class="data-summary-title">Вы указали следующие данные:</div>
+
+      <div class="data-summary">
+        <div class="subsection-title">Общие данные:</div>
+        {% for data in patient_data %}
+          <div class="data-summary-item">{{ data }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="data-summary">
+        <div class="subsection-title">Жалобы:</div>
+        {% if complaints == 'Жалобы не предъявлены.' %}
+        <div class="data-summary-item">{{ complaints }}</div>
+        {% else %}
+        {% for complaint in complaints %}
+        <div class="data-summary-item">{{ complaint }}</div>
+        {% endfor %}
+        {% endif %}
+      </div>
+
+      {% if disease %}
+      <div class="data-summary">
+        <div class="subsection-title">Давность заболевания:</div>
+        <div class="data-summary-item">{{ disease }}</div>
+      </div>
+      {% endif %}
+
+      {% if medicines %}
+      <div class="data-summary">
+        <div class="subsection-title">Принимаемые лекарства:</div>
+        <div class="data-summary-item">{{ medicines }}</div>
+      </div>
+      {% endif %}
+
+      {% if illnesses %}
+      <div class="data-summary">
+        <div class="subsection-title">Ранее перенесенные заболевания:</div>
+        <div class="data-summary-item">{{ illnesses }}</div>
+      </div>
+      {% endif %}
+
+      {% if operations %}
+      <div class="data-summary">
+        <div class="subsection-title">Ранее перенесенные операции:</div>
+        <div class="data-summary-item">{{ operations }}</div>
+      </div>
+      {% endif %}
+
+      {% if drug %}
+      <div class="data-summary">
+        <div class="subsection-title">Аллергия на лекарства:</div>
+        <div class="data-summary-item">{{ drug }}</div>
+      </div>
+      {% endif %}
+
+      {% if food %}
+      <div class="data-summary">
+        <div class="subsection-title">Аллергия на продукты питания и другие вещества:</div>
+        <div class="data-summary-item">{{ food }}</div>
+      </div>
+      {% endif %}
+
+      {% if habits %}
+      <div class="data-summary">
+        <div class="subsection-title">Вредные привычки:</div>
+        <div class="data-summary-item">{{ habits }}</div>
+      </div>
+      {% endif %}
+
+      {% if profession %}
+      <div class="data-summary">
+        <div class="subsection-title">Профессия:</div>
+        <div class="data-summary-item">{{ profession }}</div>
+      </div>
+      {% endif %}
+
+      {% if general_analyzes %}
+      <div class="data-summary">
+        <div class="subsection-title">Общий анализ крови:</div>
+        {% for analyze in general_analyzes %}
+        <div class="data-summary-item">{{ analyze.0 }}: {{ analyze.1 }} {{ analyze.2 }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if chem_analyze %}
+      <div class="data-summary">
+        <div class="subsection-title">Биохимический анализ крови:</div>
+        {% for analyze in chem_analyze %}
+        <div class="data-summary-item">{{ analyze.0 }}: {{ analyze.1 }} {{ analyze.2 }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if extra.0 or extra.1 %}
+      <div class="data-summary">
+        <div class="subsection-title">Какой специалист нужен:</div>
+        {% if extra.0 %}
+        <div class="data-summary-item">{{ extra.0 }}</div>
+        {% endif %}
+
+        {% if extra.1 %}
+        <label><b>Языки:</b></label>
+        {% for lang in extra.1 %}
+        <div class="data-summary-item">-{{ lang }}</div>
+        {% endfor %}
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="navigation-buttons">
+        <a class="backbutton" onclick="window.location.href='{% url 'extra' %}'">← Назад</a>
+        <button class="button" type="button" onclick="window.location.href='{% url 'loading' %}'">Провести
+          диагностику</button>
+      </div>
+    </div>
+  </div>
+{% endblock %}

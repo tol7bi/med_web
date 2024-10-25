@@ -1,0 +1,294 @@
+{% extends 'diagnostics/base2.html' %}
+
+
+{% block style %}
+<style>
+    .logout-link {
+        width: 100%;
+        /* Ширина элемента, чтобы текст мог выравниваться внутри */
+        text-align: right;
+        /* Выравнивание текста по правому краю */
+        font-size: 16px;
+    }
+
+    h1 {
+        word-wrap: break-word; /* Позволяет переносить слова на новую строку */
+        white-space: normal;
+    }
+
+    td input {
+        display: block; /* Убедитесь, что каждый <input> элемент занимает всю ширину строки */
+        width: 100%; /* Заставляет <input> элемент занимать всю доступную ширину */
+        box-sizing: border-box; /* Учитывает отступы и границы в ширине элемента */
+    }
+
+    .remove-row {
+        cursor: pointer;
+        color: red;
+    }
+
+    .no-bold label {
+        font-weight: normal;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="sidebar">
+        <div class="sidebar-item" onclick="window.location.href='{% url 'cabinet_clinic' %}'">Общие данные</div>
+        <div class="sidebar-item" onclick="window.location.href='{% url 'services_clinic' %}'">Услуги</div>
+        <div class="sidebar-item"><b>Языки и образование специалистов</b></div>
+
+    </div>
+
+    <div class="content">
+        <div class="logout-link">
+            {{ user.email }}<a style="padding: 5px;" href="{% url 'logout' %}">Выйти</a>
+        </div>
+        <h2>Языки и образование специалистов</h2>
+        <button style="margin-bottom: 2%;" onclick="showFormServices()">Добавить новую запись</button>
+        {% if user_education %}
+            {% for user in user_education %}
+                <div class="data-summary">
+                    <a href="#" style="display: flex; justify-content: flex-end;"
+                        onclick="confirmDelete('{{ user.specialist.id }}')">&#10006;</a>
+                    <div class="overlay" id="deleteConfirmationModal" style="display: none;">
+                        <div class="modal">
+                            <div class="modal-content">
+                                <p>Вы действительно хотите удалить данную услугу?</p>
+                                <div class="modal-buttons">
+                                    <div style="cursor: pointer;" onclick="closeDelete()">Нет</div>
+                                    <a href="{% url 'delete_specialist' user.specialist.id %}">Да</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div>{{ user.specialist.last_name_or_clinic_name}} {{user.specialist.first_name_or_clinic_address }} 
+                        {{ user.specialist.patronymic_or_clinic_hours }}</div>
+                    <div>Пол {{ user.specialist.gender }}</div>
+                    <div>Дата рождения {{ user.specialist.date_of_birth }}</div>
+                    {% if user.specialist.languages or user.specialist.other_language %}
+                        <div>Языки: {{ user.specialist.languages|join:", " }} {{ user.specialist.other_language }}</div>
+                    {% endif %}
+                    {% if user.education %}
+                        <div>Образование:</div>
+                        {% for e in user.education %}
+                            <div class="data-summary">
+                                <div>{{ e.start_date }} - {{ e.end_date }}</div>
+                                <div>{{ e.specialty }}</div>
+                                <div>{{ e.institution }}</div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% if user.specialist.academic_degree_or_home_call %}
+                        <div>Ученая степень: {{ user.specialist.academic_degree_or_home_call }}</div>
+                    {% endif %}
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <h3>Добавленных услуг нет.</h3>
+        {% endif %}
+        <div class="overlay-services overlay-form-services">
+            <div class="modal-documents" style="width: 70%; white-space: nowrap;">
+                <span class="close-button" onclick="closeFormServices()">&#10006;</span>
+                <div style="margin-left: 3%;">
+
+                    <form id="serviceForm" method="post">
+                        {% csrf_token %}
+                        <h1 style="margin-bottom: 0;">Добавление новой записи по языкам и образованию специалиста</h1>
+                        <p>Обязательные поля отмечены звездочкой (*).</p>
+
+                        <div>
+                            <div style="margin-top: 2%;">
+                                <label for="id_last_name_or_clinic_name">Фамилия*:</label>
+                                {{ form.last_name_or_clinic_name }}
+                            </div>
+                            
+
+                            <div style="margin-top: 2%;">
+                                <label for="id_last_name_or_clinic_name">Имя*:</label>
+                                {{ form.first_name_or_clinic_address }}
+                            </div>
+                            
+
+                            <div style="margin-top: 2%;">
+                                <label for="id_last_name_or_clinic_name">Отчество:</label>
+                                {{ form.patronymic_or_clinic_hours }}
+                            </div>
+                            
+
+                            <div style="margin-top: 2%;">
+                                <label for="id_last_name_or_clinic_name">Пол*:</label>
+
+                                <div class="radio-group">
+                                    {% for radio in form.gender %}
+                                    <div class="radio-group no-bold">
+                                        {{ radio }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+
+                            <div style="margin-top: 2%;">
+                                <label for="id_last_name_or_clinic_name">Дата рождения*:</label>
+                                {{ form.date_of_birth }}
+                            </div>
+                            
+                        </div>
+
+                        <div style="margin-top: 3%;">
+                            <label>Укажите языки, на которых могут быть предоставлены услуги специалиста:</label>
+                            <div>(заполняется если данный специалист может общаться на других языках, чем указаны в общих данных)</div>
+                            <div class="checkbox-group">
+                                {% for language in form.languages %}
+                                <div class="checkbox no-bold">
+                                    {{ language }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {{ form.other_language.label_tag }}
+                            {{ form.other_language }}
+                        </div>
+
+                        <div class="form-section" style="margin-top: 3%;">
+                            <label>Образование:</label>
+                            {{ education_formset.management_form }}
+                            <table class="education-table" id="education-table">
+                                <thead>
+                                    <tr>
+                                        <th>Начало</th>
+                                        <th>Окончание</th>
+                                        <th>Квалификация, специальность, тема</th>
+                                        <th>Учебное заведение</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for form in education_formset.forms %}
+                                    <tr class="education-form">
+                                        <td>{{ form.start_date }}</td>
+                                        <td>{{ form.end_date }}</td>
+                                        <td>{{ form.specialty }}</td>
+                                        <td>{{ form.institution }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <button style="margin-top: 1%; width: 15%;" type="button" onclick="addRow()">добавить</button>
+                        </div>
+
+                        <div class="form-section" style="margin-top: 3%;">
+                            <label for="id_last_name_or_clinic_name">Ученая степень:</label>
+                            {{ form.academic_degree_or_home_call }}
+                        </div>
+
+                        <button style="margin-top: 1%; display: block; width: 100%;" type="submit">сохранить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+    function confirmDelete(serviceId) {
+        // Открываем модальное окно
+        var modal = document.getElementById('deleteConfirmationModal');
+        modal.style.display = 'flex';
+
+        // Передаем id услуги для удаления в функцию удаления
+        document.getElementById('deleteServiceId').value = serviceId;
+    }
+
+    function addRow() {
+        const table = document.getElementById("education-table").getElementsByTagName('tbody')[0];
+        const lastRow = table.rows[table.rows.length - 1];
+        const inputs = lastRow.getElementsByTagName("input");
+
+        let allFilled = true;
+        for (let input of inputs) {
+            if (input.value === "") {
+                allFilled = false;
+                input.focus();
+                alert("Please fill all fields before adding a new row.");
+                return;  // Выходим, если хоть одно поле пустое
+            }
+        }
+
+        if (lastRow) {
+            const removeCell = lastRow.insertCell(-1); // Добавляем ячейку в конец
+            const removeButton = document.createElement("span");
+            removeButton.className = "remove-row";
+            removeButton.innerHTML = "❌";
+            removeButton.onclick = function() { removeRow(this); };
+            removeCell.appendChild(removeButton);
+        }
+
+        if (allFilled) {
+            const newRow = table.insertRow();
+            const rowNum = table.rows.length - 1;  // Номер новой строки
+
+            // Добавляем ячейки для новой строки
+            const startCell = newRow.insertCell(0);
+            const startInput = document.createElement("input");
+            startInput.type = "date";
+            startInput.name = `form-${rowNum}-start_date`;
+            startInput.min = "1900-01-01";
+            startInput.max = '2124-08-26';
+            startCell.appendChild(startInput);
+
+            const endCell = newRow.insertCell(1);
+            const endInput = document.createElement("input");
+            endInput.type = "date";
+            endInput.name = `form-${rowNum}-end_date`;
+            endInput.min = "1900-01-01";
+            endInput.max = '2124-08-26';
+            endCell.appendChild(endInput);
+
+            const specialtyCell = newRow.insertCell(2);
+            const specialtyInput = document.createElement("input");
+            specialtyInput.type = "text";
+            specialtyInput.name = `form-${rowNum}-specialty`;
+            specialtyCell.appendChild(specialtyInput);
+
+            const institutionCell = newRow.insertCell(3);
+            const institutionInput = document.createElement("input");
+            institutionInput.type = "text";
+            institutionInput.name = `form-${rowNum}-institution`;
+            institutionCell.appendChild(institutionInput);
+
+            // Обновляем management_form
+            document.getElementById("id_form-TOTAL_FORMS").setAttribute("value", rowNum + 1);
+        }
+    }
+    
+    function removeRow(button) {
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+
+        const table = document.getElementById("education-table").getElementsByTagName('tbody')[0];
+        const rowCount = table.rows.length;
+
+        for (let i = 0; i < rowCount; i++) {
+            const row = table.rows[i];
+            row.cells[0].getElementsByTagName('input')[0].name = `form-${i}-start_date`;
+            row.cells[1].getElementsByTagName('input')[0].name = `form-${i}-end_date`;
+            row.cells[2].getElementsByTagName('input')[0].name = `form-${i}-specialty`;
+            row.cells[3].getElementsByTagName('input')[0].name = `form-${i}-institution`;
+        }
+
+        document.getElementById("id_form-TOTAL_FORMS").setAttribute("value", rowCount);
+    }
+    </script>
+
+{% endblock %}

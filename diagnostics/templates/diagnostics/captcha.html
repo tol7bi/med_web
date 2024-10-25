@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Captcha Page</title>
+    <style>
+        form {
+            width: 300px;
+            /* Ширина формы */
+            margin: 0 auto;
+            /* Выравнивание по центру */
+            text-align: center;
+            /* Выравнивание текста по центру */
+            margin-top: 20%;
+        }
+
+        /* Стили для капчи */
+        .captcha {
+            margin-top: 20px;
+            /* Отступ сверху */
+            text-align: center;
+            /* Выравнивание текста капчи по центру */
+            margin-bottom: 20px;
+        }
+
+        .button {
+            /* padding: 10px 15px; */
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+        }
+
+        .text {
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: bolder;
+        }
+    </style>
+
+</head>
+
+<body>
+    <form method="post" id="captchaForm">
+        {% csrf_token %}
+        <!-- <input type="hidden" name="csrfmiddlewaretoken" value="4PjJNmRd2dxBuuCTHJWB8N4QR2SXTXBVGh9Bapd6M1il2SjrwGhVpZZnOPuJ7TjK"> -->
+        <div class="captcha">
+            <div class="text">Пройдите капчу для дальнейшей диагностики.</div>
+            <script src="https://www.google.com/recaptcha/api.js"></script>
+            <script type="text/javascript">
+                // Submit function to be called, after reCAPTCHA was successful.
+                var onSubmit = function (token) {
+                    var formData = document.getElementById('captchaForm');
+                    console.log(formData);
+                    console.log("reCAPTCHA validated for 'data-widget-uuid=\"d2e8449796d34171bcb1fec4ff446717\"'")
+                    formData.submit();
+                };
+            </script>
+
+            <div class="g-recaptcha" data-sitekey="6LdYKfQnAAAAAGi496elZgBy_AggwjWeKIhhpg3t" required id="id_captcha"
+                data-widget-uuid="d2e8449796d34171bcb1fec4ff446717" data-callback="onSubmit" data-size="normal">
+            </div>
+        </div>
+        <a class="button" onclick="window.history.back()">← Назад</a>
+    </form>
+</body>
+
+</html>

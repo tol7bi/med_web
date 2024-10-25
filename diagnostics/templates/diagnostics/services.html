@@ -1,0 +1,422 @@
+{% extends 'diagnostics/base2.html' %}
+
+{% block style %}
+<style>
+    .logout-link {
+        width: 100%;
+        /* Ширина элемента, чтобы текст мог выравниваться внутри */
+        text-align: right;
+        /* Выравнивание текста по правому краю */
+        font-size: 16px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    form div {
+        height: 10%;
+    }
+
+    form label {
+        height: 10%;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Убираем маркеры списка для всех li */
+    li {
+        list-style-type: none;
+    }
+
+    .no-bold label {
+        font-weight: normal;
+    }
+
+    textarea {
+        font-family: Arial;
+    }
+
+    .overlay-services .modal-documents {
+        width: 40%;
+        white-space: normal;
+        /* Allow text to wrap */
+    }
+
+    .modal-documents form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-documents form ul {
+        list-style-type: none;
+        /* Remove bullet points from list */
+        padding: 0;
+        /* Remove padding from list */
+        margin: 0;
+        /* Remove margin from list */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="sidebar">
+        <div class="sidebar-item" onclick="window.location.href='{% url 'cabinet_specialist' %}'">Общие данные</div>
+        <div class="sidebar-item"><b>Услуги</b></div>
+    </div>
+
+    <div class="content">
+        <div class="logout-link">
+            {{ user.email }}<a style="padding: 5px;" href="{% url 'logout' %}">Выйти</a>
+        </div>
+        <h2>Услуги</h2>
+        <button style="margin-bottom: 2%;" onclick="showFormServices()">Добавить услугу</button>
+        {% if services %}
+        {% for s in services %}
+        <div class="data-summary">
+            <a href="#" style="display: flex; justify-content: flex-end;"
+                onclick="confirmDelete('{{ s.id }}')">&#10006;</a>
+            <div class="overlay" id="deleteConfirmationModal" style="display: none;">
+                <div class="modal">
+                    <div class="modal-content">
+                        <p>Вы действительно хотите удалить данную услугу?</p>
+                        <div class="modal-buttons">
+                            <div style="cursor: pointer;" onclick="closeDelete()">Нет</div>
+                            <a href="{% url 'delete_service' s.id %}">Да</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div>{{ s.service_type.1 }}</div>
+            {% if s.service_type.1 == 'процедура (манипуляция, операция, …)' %}
+            <div>{{ s.service_type.2 }}</div>
+            {% endif %}
+            <div>{{ s.service_category.1 }}</div>
+            <div>{{ s.service_category.2 }}</div>
+
+            {% if s.service_category.1 != 'не медицинская услуга' %}
+                <div>Действующий сертификат по специальности: </div>
+                    <div style="margin-left: 2%;">начало: {% if s.service_category.3 %}{{ s.service_category.3 }}{% else %}--{% endif %}</div>
+                    <div style="margin-left: 2%;">окончание: {% if s.service_category.4 %}{{ s.service_category.4 }}{% else %}--{% endif %}</div>
+                <div>Категория по специальности: {% if s.service_category.5 %}{{ s.service_category.5 }}{% else %}--{% endif %}</div>
+            {% endif %}
+
+            {% if s.home_service %}
+                <div>Возможность оказать данную услугу на дому: {{ s.home_service }}</div>
+            {% else %}
+                <div>Возможность оказать данную услугу на дому: --</div>
+            {% endif %}
+
+            <div>
+                Возраст пациентов, лет:
+                {% if s.age_from %}
+                от {{ s.age_from }}
+                {% else %}
+                от --
+                {% endif %}
+                до
+                {% if s.age_to %}
+                {{ s.age_to }}
+                {% else %}
+                --
+                {% endif %}
+            </div>
+
+            <div>Стаж по предлагаемой услуге, лет: {{ s.experience }}</div>
+            <div>Стоимость: {{ s.cost }}</div>
+            <div>{{ s.online_payment }}</div>
+
+            {% if s.keywords %}
+            <div>Ключевые поисковые слова предлагаемой услуги: {{ s.keywords }}</div>
+            {% else %}
+            <div>Ключевые поисковые слова предлагаемой услуги: --</div>
+            {% endif %}
+
+            {% if s.clinic_name_or_service_email %}
+            <div>Название клиники: {{ s.clinic_name_or_service_email }}</div>
+            {% else %}
+            <div>Название клиники: --</div>
+            {% endif %}
+
+            {% if s.service_address %}
+            <div>Адрес: {{ s.service_address }}</div>
+            {% else %}
+            <div>Адрес: --</div>
+            {% endif %}
+
+            {% if s.appointment_time %}
+            <div>Время приема: {{ s.appointment_time }}</div>
+            {% else %}
+            <div>Время приема: --</div>
+            {% endif %}
+
+            {% if s.additional_info %}
+            <div>Дополнительная информация о предлагаемой услуге: {{ s.additional_info }}</div>
+            {% else %}
+            <div>Дополнительная информация о предлагаемой услуге: --</div>
+            {% endif %}
+
+            
+
+        </div>
+        {% endfor %}
+        {% else %}
+        <h3>Добавленных услуг нет.</h3>
+        {% endif %}
+        <div class="overlay-services overlay-form-services">
+            <div class="modal-documents" style="width: 40%;">
+                <span class="close-button" onclick="closeFormServices()">&#10006;</span>
+                <div style="margin-left: 3%;">
+
+                    <form id="serviceForm" method="post" onsubmit="return validateForm()">
+                        {% csrf_token %}
+                        <h1>Добавление новой услуги</h1>
+                        {{ form.serviceType.label_tag }}
+                        <div class="no-bold">{{ form.serviceType.0 }}</div>
+                        <div id="consultationDetails" class="hidden" style="margin-left: 4%;">
+                            {{ form.consultationType.label_tag }}<div class="no-bold">{{ form.consultationType }}
+                            </div>
+                        </div>
+
+                        <div class="no-bold">{{ form.serviceType.1 }}</div>
+                        <div id="procedureDetails" class="hidden" style="margin-left: 4%;">
+                            {{ form.procedureName.label_tag }}{{ form.procedureName }}
+                        </div>
+
+                        {{ form.serviceCategory.label_tag }}
+                        <div class="no-bold">{{ form.serviceCategory.0 }}</div>
+                        <div id="medicalDetails" class="hidden" style="margin-left: 4%;">
+                            {{ form.medicalType.label_tag }}<div class="no-bold">{{ form.medicalType }}</div>
+                            <div id="doctorDetails" class="hidden">
+
+                                {{ form.doctorSpecialty.label_tag }}{{ form.doctorSpecialty }}
+
+                                <label style="margin-top: 2%;">Действующий сертификат по специальности:</label>
+                                {{ form.certificateStart.label_tag }}{{ form.certificateStart }}
+                                {{ form.certificateEnd.label_tag }}{{ form.certificateEnd }}
+
+                                <div style="margin-top: 3%;">
+                                    <label>Категория по специальности:</label>
+                                    {{ form.category.label_tag }}<div class="no-bold">{{ form.category }}</div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="no-bold">{{ form.serviceCategory.1 }}</div>
+                        <div id="nonMedicalDetails" class="hidden" style="margin-left: 4%;">
+                            {{ form.nonMedicalSpecialty.label_tag }}{{ form.nonMedicalSpecialty }}
+                        </div>
+
+                        <div style="margin-top: 3%;">
+                            <label for="id_homeService_0">Возможность оказать данную услугу на дому*:</label>
+                            <div class="no-bold">{{ form.homeService }}</div>
+                        </div>
+
+
+                        <div style="margin-top: 3%;">
+                            {{ form.ageFrom.label_tag }}
+                            {{ form.ageFrom }}
+                            {{ form.ageTo.label_tag }}
+                            {{ form.ageTo }}
+                        </div>
+
+
+                        <div style="margin-top: 3%;">
+                            {{ form.experience.label_tag }}
+                            {{ form.experience }}
+                        </div>
+
+
+                        <div style="margin-top: 3%;">
+                            {{ form.cost.label_tag }}
+                            {{ form.cost }}
+                        </div>
+
+
+                        <div style="margin-top: 3%;">
+                            {{ form.onlinePayment.label_tag }}
+                            <div class="no-bold">{{ form.onlinePayment }}</div>
+                        </div>
+
+
+                        <div style="margin-top: 3%;">
+                            {{ form.keywords.label_tag }}
+                            {{ form.keywords }}
+                        </div>
+
+
+                        <div style="margin-top: 3%;">
+                            {{ form.clinicName.label_tag }}
+                            {{ form.clinicName }}
+                        </div>
+
+
+                        <div style="margin-top: 3%;">
+                            {{ form.clinicAddress.label_tag }}
+                            {{ form.clinicAddress }}
+                        </div>
+
+
+                        <div style="margin-top: 3%;">
+                            {{ form.appointmentTime.label_tag }}
+                            {{ form.appointmentTime }}
+                        </div>
+
+
+                        <div style="margin-top: 3%;">
+                            {{ form.additionalInfo.label_tag }}
+                            {{ form.additionalInfo }}
+                        </div>
+
+                        <button type="submit">сохранить услугу</button>
+                    </form>
+
+                    <script>
+                        function confirmDelete(serviceId) {
+                            // Открываем модальное окно
+                            var modal = document.getElementById('deleteConfirmationModal');
+                            modal.style.display = 'flex';
+
+                            // Передаем id услуги для удаления в функцию удаления
+                            document.getElementById('deleteServiceId').value = serviceId;
+                        }
+
+                        function validateForm() {
+                            var valid = true;
+                            var consultationDetails = document.getElementById('consultationDetails');
+                            var procedureDetails = document.getElementById('procedureDetails');
+                            var medicalDetails = document.getElementById('medicalDetails');
+                            var nonMedicalDetails = document.getElementById('nonMedicalDetails');
+                            var doctorDetails = document.getElementById('doctorDetails');
+
+                            if (!consultationDetails.classList.contains('hidden')) {
+                                if (!document.querySelector('input[name="consultationType"]:checked')) {
+                                    valid = false;
+                                    alert('Выберите тип консультации.');
+                                }
+                            }
+
+                            if (!procedureDetails.classList.contains('hidden')) {
+                                if (!document.querySelector('input[name="procedureName"]').value) {
+                                    valid = false;
+                                    alert('Введите название процедуры.');
+                                }
+                            }
+
+                            if (!medicalDetails.classList.contains('hidden')) {
+                                if (!document.querySelector('input[name="medicalType"]:checked')) {
+                                    valid = false;
+                                    alert('Выберите тип медицинской услуги.');
+                                } else if (!doctorDetails.classList.contains('hidden')) {
+                                    if (!document.querySelector('input[name="doctorSpecialty"]').value) {
+                                        valid = false;
+                                        alert('Введите название специальности.');
+                                    }
+                                    // if (!document.querySelector('input[name="certificateStart"]').value || !document.querySelector('input[name="certificateEnd"]').value) {
+                                    //     valid = false;
+                                    //     alert('Введите даты начала и окончания действия сертификата.');
+                                    // }
+                                }
+                            }
+
+                            if (!nonMedicalDetails.classList.contains('hidden')) {
+                                if (!document.querySelector('input[name="nonMedicalSpecialty"]').value) {
+                                    valid = false;
+                                    alert('Введите название специальности.');
+                                }
+                            }
+
+                            if (!document.querySelector('input[name="experience"]').value) {
+                                valid = false;
+                                alert('Введите стаж.');
+                            }
+
+                            if (!document.querySelector('input[name="homeService"]:checked')) {
+                                valid = false;
+                                alert('Выберите возможность оказать данную услугу на дому.');
+                            }
+
+                            return valid;
+                        }
+
+                        function toggleServiceDetails() {
+                            var serviceType = document.querySelector('input[name="serviceType"]:checked').value;
+
+                            var consultationDetails = document.getElementById('consultationDetails');
+                            var procedureDetails = document.getElementById('procedureDetails');
+
+                            if (serviceType === 'консультация') {
+                                consultationDetails.classList.remove('hidden');
+                            } else {
+                                consultationDetails.classList.add('hidden');
+                            }
+
+                            if (serviceType === 'процедура (манипуляция, операция, …)') {
+                                procedureDetails.classList.remove('hidden');
+                            } else {
+                                procedureDetails.classList.add('hidden');
+                            }
+                        }
+
+                        function toggleCategoryDetails() {
+                            var serviceCategory = document.querySelector('input[name="serviceCategory"]:checked').value;
+
+                            var medicalDetails = document.getElementById('medicalDetails');
+                            var nonMedicalDetails = document.getElementById('nonMedicalDetails');
+
+                            if (serviceCategory === 'медицинская услуга') {
+                                medicalDetails.classList.remove('hidden');
+                                nonMedicalDetails.classList.add('hidden');
+                            } else {
+                                medicalDetails.classList.add('hidden');
+                                nonMedicalDetails.classList.remove('hidden');
+
+                                document.querySelector('input[name="certificateStart"]').value = "";
+                                document.querySelector('input[name="certificateEnd"]').value = "";
+                            }
+                            // Show doctor details for both medical and non-medical categories
+                            if (serviceCategory === 'медицинская услуга' || serviceCategory === 'не медицинская услуга') {
+                                var medicalType = document.querySelector('input[name="medicalType"]:checked');
+                                toggleMedicalTypeDetails(medicalType ? medicalType.value : null);
+                            }
+                        }
+
+                        function toggleMedicalTypeDetails(type) {
+                            // Always show doctorDetails for medical types
+                            document.getElementById('doctorDetails').classList.remove('hidden');
+                        }
+
+                        document.querySelectorAll('input[name="serviceType"]').forEach(function (radio) {
+                            radio.addEventListener('click', toggleServiceDetails);
+                        });
+
+                        document.querySelectorAll('input[name="serviceCategory"]').forEach(function (radio) {
+                            radio.addEventListener('click', toggleCategoryDetails);
+                        });
+
+                        document.querySelectorAll('input[name="medicalType"]').forEach(function (radio) {
+                            radio.addEventListener('click', function () {
+                                toggleMedicalTypeDetails(this.value);
+                            });
+                        });
+
+                        window.addEventListener('load', function () {
+                            toggleServiceDetails();
+                            toggleCategoryDetails();
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

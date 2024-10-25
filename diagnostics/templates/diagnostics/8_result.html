@@ -1,0 +1,134 @@
+{% extends 'diagnostics/base.html' %}
+
+{% block style %}
+  <style>
+    .footer-header::before {
+      content: none;
+      width: 100%;
+      height: 1px;
+      background-color: rgba(200, 200, 200, 0.6);
+      position: absolute;
+      top: auto;
+      left: 0;
+    }
+    hr{
+      background-color: rgba(200, 200, 200, 0.6);
+      height: 1px;
+      width: 100%;
+      border: none;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="container-result">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="window.location.href='{% url 'general' %}'">Общие сведения</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'complaints' %}'">Жалобы</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'disease' %}'">Давность заболевания</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'medicines' %}'">Принимаемые лекарства</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'illnesses' %}'">Ранее перенесённые заболевания
+      </div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'operations' %}'">Ранее перенесённые операции
+      </div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'drug' %}'">Аллергия на лекарства</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'food' %}'">Аллергия на продукты питания и другие
+        вещества</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'habits' %}'">Вредные привычки</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'profession' %}'">Профессия</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'blood' %}'">Общий анализ крови</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'chem' %}'">Биохимический анализ крови</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'extra' %}'">Врач, процедура</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'data' %}'">Введенные данные</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'loading' %}'"><b>Результат диагностики</b></div>
+      {% if doctor %}
+        <div class="sidebar-item" onclick="window.location.href='{% url 'success' %}'">Выбранный врач</div>
+      {% else %}
+        <div class="sidebar-item" onclick="window.location.href='{% url 'loading' %}'">Выбранный врач</div>
+      {% endif %}
+    </div>
+    <div class="main-content">
+      <div class="section-title">Результат диагностики</div>
+      {% if warning %}
+      <div class="important-message">
+        ВНИМАНИЕ! Имеются симптомы, которые могут быть проявлением срочного, неотложного состояния, угрожающего здоровью
+        и жизни!<br>
+        Вам следует СРОЧНО обратиться за медицинской помощью и обязательно сообщите об этих симптомах врачу:<br>
+        {% for element in warning %}
+        {{ element }}<br>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="diagnoses-message">Индекс массы тела: {{ vivod_BMI.0 }} - {{ vivod_BMI.1 }}</div>
+      <div class="diagnoses-list">
+        {% if diag %}
+        <div class="diagnoses-title">На основании предъявленных жалоб и результатов обследования обнаружены признаки
+          следующих диагнозов и состояний.</div>
+        <div class="diagnoses-message">
+          !!! ВНИМАНИЕ: ДАННЫЕ ДИАГНОЗЫ И СОСТОЯНИЯ ПРЕДВАРИТЕЛЬНЫЕ И ДОЛЖНЫ БЫТЬ ПРОВЕРЕНЫ ВРАЧЕМ !!!<br>
+          <b>На первых местах более вероятные диагнозы и состояния:</b>
+        </div>
+        <ul>
+          {% for element in diag %}
+          <li>{{ element.0 }}<br>({{ element.1|join:", " }})</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="diagnoses-title">На основании предъявленных жалоб и результатов обследования подозрений на
+          какие-либо диагнозы и патологические состояния не выявлено.</div>
+        <div class="diagnoses-title">Если Вас все же что-то беспокоит, то стоит обратиться к врачу общей практики
+          (показать список врачей общей практики).</div>
+        {% endif %}
+      </div>
+      {% if doctors %}
+      <div class="diagnoses-title">
+        По обнаруженным диагнозам и состояниям Вас могут проконсультировать следующие врачи.<br>
+        На первых местах врачи оперативно консультирующие по наибольшему количеству более вероятных диагнозов и
+        состояний:
+      </div>
+      <table class="doctor-table">
+        <thead>
+          <tr>
+            <th>Специалист</th>
+            <th>Ваши симптомы по профилю специалиста</th>
+            <th>Информация об услуге</th>
+            <th>Стоимость (в тенге)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for doctor in doctors %}
+          <tr>
+            <td class="doctor-name">{{ doctor.0 }}</td>
+            <td class="doctor-specialty">
+              {% for item in doctor.1 %}
+                - {{ item }} 
+                <br>
+              {% endfor %}
+            </td>
+            <td class="doctor-diagnoses">{{ doctor.2 }}</td>
+            <td>
+              {{ doctor.3 }}
+              <br>
+              <button class="button" onclick="redirectToContacts('{{ doctor.6|safe }}')">
+                ПРОЙТИ КОНСУЛЬТАЦИЮ
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    function redirectToContacts(doctor) {
+        // Ваш код обработки doctor (если необходимо)
+    
+        // Перенаправление на страницу contacts с использованием JavaScript
+        window.location.href = '{% url 'choose' %}?doctor=' + encodeURIComponent(doctor);
+    }
+  </script>
+{% endblock %}

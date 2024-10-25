@@ -1,0 +1,111 @@
+{% extends 'diagnostics/base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="submitForm('{% url 'general' %}')">Общие сведения</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'complaints' %}')">Жалобы</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'disease' %}')">Давность заболевания</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'medicines' %}')">Принимаемые лекарства</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'illnesses' %}')"><b>Ранее перенесённые заболевания</b>
+      </div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'operations' %}')">Ранее перенесённые операции</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'drug' %}')">Аллергия на лекарства</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'food' %}')">Аллергия на продукты питания и другие вещества
+      </div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'habits' %}')">Вредные привычки</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'profession' %}')">Профессия</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'blood' %}')">Общий анализ крови</b></div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'chem' %}')">Биохимический анализ крови</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'extra' %}')">Врач, процедура</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'data' %}')">Введенные данные</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'loading' %}')">Результат диагностики</div>
+      {% if doctor %}
+        <div class="sidebar-item" onclick="submitForm('{% url 'success' %}')">Выбранный врач</div>
+      {% else %}
+        <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'loading' %}')">Выбранный врач</div>
+      {% endif %}
+    </div>
+    <div class="content">
+      <div class="section-title">Ранее перенесенные заболевания</div>
+      <form id="form" class="form-section" action="{% url 'illnesses' %}" method="post">
+        {% csrf_token %}
+        <div>
+          {{ form.input }}
+        </div>
+        <div class="navigation-buttons">
+          <a class="backbutton" onclick="submitForm('{% url 'medicines' %}')">← Назад</a>
+          <button class="button" type="submit" onclick="saveFormData()">Далее</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+
+    function saveFormData() {
+      // Получите данные из полей формы
+      var formData = {};
+
+      // Пример: сохранение значения поля "protein"
+      var formElements = document.querySelectorAll('form input');
+      formElements.forEach(function (element) {
+        formData[element.name] = element.value;
+      });
+
+      // Сохраняем данные в localStorage
+      localStorage.setItem("Illnesses", JSON.stringify(formData));
+
+      // Выводим данные в консоль после сохранения
+      console.log("Данные после сохранения:", formData);
+    }
+
+    function submitForm(url) {
+      var form = document.getElementById('form');
+
+      // Создайте объект для AJAX-запроса
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', form.action, true);
+
+
+      // Отправьте форму с использованием AJAX
+      xhr.send(new FormData(form));
+
+      // Установите обработчик события для завершения запроса
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          // Обработка успешного ответа от сервера
+          // Перенаправьте пользователя на указанную страницу
+          window.location.href = url;
+        }
+      };
+      saveFormData()
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+      function restoreFormData() {
+        var savedData = localStorage.getItem('Illnesses');
+        if (savedData) {
+          var formData = JSON.parse(savedData);
+
+          // Получите все поля формы
+          var formFields = document.querySelectorAll('form input');
+
+          // Переберите поля и установите значения из formData
+          formFields.forEach(function (field) {
+            var fieldName = field.getAttribute('name');
+            if (formData.hasOwnProperty(fieldName)) {
+              field.value = formData[fieldName];
+            }
+          });
+        }
+      }
+
+      // Вызовите функцию восстановления данных при загрузке страницы
+      window.onload = restoreFormData;
+    });
+  </script>
+{% endblock %}

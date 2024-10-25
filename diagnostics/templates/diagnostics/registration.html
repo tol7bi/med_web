@@ -1,0 +1,41 @@
+{% extends 'diagnostics/base2.html' %}
+
+{% block content %}
+<form action="{% url 'registration' %}" method="post">
+    {% csrf_token %}
+    {% if form.errors %}
+    <div style="margin-top: 50px;">
+        {{ form.errors }}
+    </div>
+    {% endif %}
+    {% for choice in form.type %}
+    <div class="form-group">
+        {{ choice.tag }}
+        {{ choice.choice_label }}
+    </div>
+    {% endfor %}
+    <div>
+        <div>
+            <label for="{{ form.email.id_for_label }}">Email:</label>
+            {{ form.email }}
+        </div>
+        <div>
+            <label for="{{ form.password1.id_for_label }}">Пароль:</label>
+            {{ form.password1 }}
+        </div>
+        <div>
+            <label for="{{ form.password2.id_for_label }}">Подтвердите пароль:</label>
+            {{ form.password2 }}
+        </div>
+    </div>
+    <div style="display: flex;">
+        <input type="checkbox" id="specialistRegistration" required>
+        <label for="specialistRegistration">Я прочитал(а) и принимаю <a href="#" onclick="showRules()">Условия регистрации специалиста.</a></label>
+    </div>
+
+    <div class="navigation-buttons">
+        <a class="backbutton" onclick="window.history.back()">← Back</a>
+        <button class="button" type="submit">Регистрация</button>
+    </div>
+</form>
+{% endblock %}

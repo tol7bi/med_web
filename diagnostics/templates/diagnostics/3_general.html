@@ -1,0 +1,177 @@
+{% extends 'diagnostics/base.html' %}
+
+{% block style %}
+  <style>
+    label {
+      font-weight: normal;
+      display: block;
+      margin-bottom: 5px;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="submitForm('{% url 'general' %}')"><b>Общие сведения</b></div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'complaints' %}')">Жалобы</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'disease' %}')">Давность заболевания</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'medicines' %}')">Принимаемые лекарства</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'illnesses' %}')">Ранее перенесённые заболевания</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'operations' %}')">Ранее перенесённые операции</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'drug' %}')">Аллергия на лекарства</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'food' %}')">Аллергия на продукты питания и другие вещества
+      </div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'habits' %}')">Вредные привычки</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'profession' %}')">Профессия</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'blood' %}')">Общий анализ крови</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'chem' %}')">Биохимический анализ крови</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'extra' %}')">Врач, процедура</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'data' %}')">Введенные данные</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'loading' %}')">Результат диагностики</div>
+      {% if doctor %}
+        <div class="sidebar-item" onclick="submitForm('{% url 'success' %}')">Выбранный врач</div>
+      {% else %}
+        <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'loading' %}')">Выбранный врач</div>
+      {% endif %}
+    </div>
+    <div class="content">
+      <div class="section-title">Общие сведения</div>
+      <form id="form" action="{% url 'general' %}" method="post">
+        {% csrf_token %}
+        <div class="gender-inputs">
+          <label class="form-label" style="margin-right: 20px;">Пол:</label>
+
+          <label for="id_gender_0"><input type="radio" name="gender" value="M" class="input-field" name="gender"
+              onclick="showIsPregnancy()" id="id_gender_0" required>
+            мужской</label>
+
+          <label for="id_gender_1"><input type="radio" name="gender" value="F" class="input-field" name="gender"
+              onclick="showIsPregnancy()" id="id_gender_1" required>
+            женский</label>
+
+        </div>
+
+        <label class="form-label">Возраст, лет:</label>
+        {{ form.age }}
+
+        <label class="form-label">Вес, кг:</label>
+        {{ form.weight }}
+
+        <label class="form-label">Рост, см:</label>
+        {{ form.height }}
+
+        <div class="checkbox-list">
+          <div class="checkbox-item">
+            <input type="checkbox" name="ispregnancy" id="terms" onclick="showIsPregnancy()">
+            <label for="terms">Наличие беременности в настоящее время</label>
+          </div>
+        </div>
+
+
+        <div class="pregnancy-weeks">
+          <label class="form-label">Срок беременности, недели:</label>
+          {{ form.pregnancy }}
+        </div>
+      </form>
+      <div class="navigation-buttons" style="justify-content: flex-end;">
+        <button class="button" onclick="submitForm('{% url 'complaints' %}')">Далее</button>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    document.getElementById("current-language").addEventListener("click", function () {
+      var languageDropdown = document.getElementById("language-dropdown");
+      if (languageDropdown.style.display === "block") {
+        languageDropdown.style.display = "none";
+      } else {
+        languageDropdown.style.display = 'block';
+      }
+    });
+
+
+    function saveFormData() {
+      // Получите данные из полей формы
+      var formData = {};
+
+      // Получите значения полей формы и сохраните их в объект formData
+      formData.gender = document.querySelector('input[name="gender"]:checked').value;
+      formData.age = document.querySelector('input[name="age"]').value;
+      formData.weight = document.querySelector('input[name="weight"]').value;
+      formData.height = document.querySelector('input[name="height"]').value;
+
+      // Проверьте, есть ли чекбокс "Наличие беременности" и сохраните его значение
+      var isPregnancyCheckbox = document.querySelector('input[name="ispregnancy"]');
+      formData.ispregnancy = isPregnancyCheckbox ? isPregnancyCheckbox.checked : false;
+
+      // Если чекбокс "Наличие беременности" отмечен, получите значение срока беременности
+      if (formData.ispregnancy) {
+        console.log(document.querySelector('input[name="pregnancy"]'));
+        formData.pregnancy = document.querySelector('input[name="pregnancy"]').value;
+      }
+
+      // Сохраните данные в localStorage
+      localStorage.setItem("General", JSON.stringify(formData));
+      // Выведите данные в консоль после сохранения (для проверки)
+      console.log("Данные после сохранения:", formData);
+      // alert(1)
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // Вызываем restoreFormData при загрузке DOM
+      restoreFormData();
+
+      function restoreFormData() {
+        var savedData = localStorage.getItem('General');
+        if (savedData) {
+          var formData = JSON.parse(savedData);
+
+          var weightField = document.querySelector('input[name="weight"]');
+          if (weightField) {
+            weightField.value = formData.weight;
+          }
+
+          var heightField = document.querySelector('input[name="height"]');
+          if (heightField) {
+            heightField.value = formData.height;
+          }
+
+          // Восстанавливаем значение поля возраста
+          var ageField = document.querySelector('input[name="age"]');
+          if (ageField) {
+            ageField.value = formData.age;
+          }
+
+          var genderRadio = document.querySelectorAll('input[name="gender"]');
+          genderRadio.forEach(function (radio) {
+            if (radio.value === formData.gender) {
+              radio.checked = true;
+              showIsPregnancy()
+            }
+          });
+
+          // Восстановите значение чекбокса "Наличие беременности"
+          var isPregnancyCheckbox = document.querySelector('input[name="ispregnancy"]');
+          // alert(isPregnancyCheckbox);
+          if (isPregnancyCheckbox) {
+            isPregnancyCheckbox.checked = formData.ispregnancy;
+            showIsPregnancy();
+          }
+
+          var PregnancyWeeks = document.querySelector('input[name="pregnancy"]')
+          if (PregnancyWeeks) {
+            // alert(PregnancyWeeks==null);
+
+            PregnancyWeeks.value = formData.pregnancy;
+            showIsPregnancy();
+          }
+
+        }
+      }
+    });
+
+  </script>
+{% endblock %}

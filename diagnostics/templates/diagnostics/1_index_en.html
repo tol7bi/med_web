@@ -1,0 +1,126 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Condition Diagnosis</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+  <style>
+    .navigation-buttons {
+      justify-content: flex-end;
+    }
+
+    /* Styles for the dropdown language selector */
+    .language-dropdown {
+      position: absolute;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      z-index: 1;
+    }
+
+    .language-dropdown ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .language-dropdown li {
+      padding: 5px;
+    }
+
+    .language-dropdown li a {
+      text-decoration: none;
+      color: #333;
+    }
+
+    .language-dropdown li a:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Styles for the currently selected language */
+    .language:hover #current-language {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-content">
+      <div class="header-title">sm-ds-dr<br><span style="font-size: 18px;">(symptoms-diagnosis-doctor)</span></div>
+      <div class="language">
+        <span id="current-language">English</span>
+        <div id="language-dropdown" style="display: none" class="language-dropdown">
+          <ul>
+            <li><a href="{% url 'set_language' 'ru' %}">Русский</a></li>
+            <li><a href="{% url 'set_language' 'en' %}">English</a></li>
+            <!-- Add other languages if needed -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="window.location.href='{% url 'index' %}'"><b>About the Project</b></div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'privacy' %}'">Terms of Use</div>
+    </div>
+    <div class="main-content">
+      <div class="title-text">Take a Diagnosis of Your Health Condition</div>
+      <div style="margin-bottom: 20px;">As a result, you will receive: </div>
+      <div class="list">
+        <div class="list-item">- Identification of serious symptoms,</div>
+        <div class="list-item">- Preliminary most likely diagnoses and conditions (including possible side effects of medications, harmful habits, lifestyle, ...),</div>
+        <div class="list-item">- A list of doctors who consult on the found diagnoses.</div>
+      </div>
+      <div class="navigation-buttons">
+        <a class="button" onclick="window.location.href='{% url 'privacy' %}'">Next</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-header">
+    <div class="footer">
+      <div style="margin-bottom: 20px;">
+        <a href="javascript:void(0);" onclick="showContactModal()">Contact</a>
+      </div>
+      <div>&copy; 2023 Health Diagnosis. All rights reserved.</div>
+    </div>
+  </div>
+  <div class="overlay overlay-contact">
+    <div class="modal">
+      <span class="close-button" onclick="closeContactModal()">&#10006;</span>
+      <h2>Contact Information</h2>
+      <p>You can place contact information here:</p>
+      <!-- Add contact information here -->
+    </div>
+  </div>
+  <script src="{% static 'js/script.js' %}"></script>
+  <script>
+    // JavaScript for displaying and hiding the language dropdown
+    var languageDropdown = document.getElementById("language-dropdown");
+
+    document.getElementById("current-language").addEventListener("click", function () {
+      console.log(11);
+      if (languageDropdown.style.display === "block") {
+        languageDropdown.style.display = "none";
+      } else {
+        languageDropdown.style.display = 'block';
+      }
+    });
+
+    // // Close the language dropdown if clicked outside of it
+    // document.addEventListener("click", function (event) {
+    //   if (!languageDropdown.contains(event.target)) {
+    //     languageDropdown.style.display = "none";
+    //   }
+    // });
+
+  </script>
+</body>
+
+</html>

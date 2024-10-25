@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Loading Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .loader-container {
+            text-align: center;
+        }
+
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+    </style>
+
+    <script>
+        setTimeout(function () {
+            window.location.href = "{% url 'result' %}";
+        }, 500);
+    </script>
+</head>
+
+<body>
+    <div class="loader-container">
+        <div class="loader"></div>
+        <div class="message">Please wait while we load your data...</div>
+    </div>
+</body>
+
+</html>

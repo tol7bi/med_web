@@ -1,0 +1,442 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health State Diagnosis</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-title" onclick="showModal()">sm-ds-dr<br><span
+                    style="font-size: 18px;">(symptoms-diagnosis-doctor)</span></div>
+            <div class="language">
+                <span id="current-language">English</span>
+                <div id="language-dropdown" style="display: none" class="language-dropdown">
+                    <ul>
+                        <li><a href="{% url 'set_language' 'ru' %}">Русский</a></li>
+                        <li><a href="{% url 'set_language' 'en' %}">English</a></li>
+                        <!-- Добавьте другие языки, если необходимо -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-item" onclick="submitForm('{% url 'general' %}')">General Information</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'complaints' %}')">Complaints</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'disease' %}')">Duration of Illness</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'medicines' %}')">Medications Taken</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'illnesses' %}')">Previous Illnesses</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'operations' %}')">Previous Operations</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'drug' %}')">Drug Allergies</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'food' %}')">Food and Other Allergies</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'habits' %}')">Harmful Habits</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'blood' %}')">Complete Blood Count</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'chem' %}')"><b>Biochemical Blood Analysis</b></div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'extra' %}')">Which Specialist is Needed</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'data' %}')">Entered Data</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'loading' %}')">Diagnosis Results</div>
+        </div>
+        <div class="content">
+            <form id="form" class="form-section" action="{% url 'chem' %}" method="post">
+                {% csrf_token %}
+                <div class="section-title">Biochemical Blood Analysis</div>
+
+                {% for message in messages %}
+                {% if "info" in message.tags %}
+                <div class="error-message">{{ message }}</div>
+                {% endif %}
+                {% endfor %}
+
+                <div class="form-group">
+                    <label for="id_ALT">ALT (Alanine Aminotransferase):</label>
+                    U/L
+                    <input type="number" name="ALT" min="0" class="input-field-blood" name="ALT" placeholder="Enter result" step="any" id="id_ALT">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_ALB">Albumin (ALB):</label>
+                    g/L
+                    <input type="number" name="ALB" min="0" class="input-field-blood" name="ALB" placeholder="Enter result" step="any" id="id_ALB">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_alpha_amylase">Total Alpha-Amylase:</label>
+                    U/L
+                    <input type="number" name="alpha_amylase" min="0" class="input-field-blood" name="alpha_amylase" placeholder="Enter result" step="any" id="id_alpha_amylase">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_amylase">Pancreatic Amylase:</label>
+                    U/L
+                    <input type="number" name="amylase" min="0" class="input-field-blood" name="amylase" placeholder="Enter result" step="any" id="id_amylase">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_ACT">AST (Aspartate Aminotransferase):</label>
+                    U/L
+                    <input type="number" name="ACT" min="0" class="input-field-blood" name="ACT" placeholder="Enter result" step="any" id="id_ACT">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_protein">Total Protein:</label>
+                    g/L
+                    <input type="number" name="protein" min="0" class="input-field-blood" name="protein" placeholder="Enter result" step="any" id="id_protein">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_beta_globulin">Beta-Globulin:</label>
+                    g/L
+                    <input type="number" name="beta_globulin" min="0" class="input-field-blood" name="beta_globulin" placeholder="Enter result" step="any" id="id_beta_globulin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_bilirubin_general">Total Bilirubin:</label>
+                    µmol/L
+                    <input type="number" name="bilirubin_general" min="0" class="input-field-blood" name="bilirubin_general" placeholder="Enter result" step="any" id="id_bilirubin_general">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_bilirubin_direct">Direct Bilirubin:</label>
+                    µmol/L
+                    <input type="number" name="bilirubin_direct" min="0" class="input-field-blood" name="bilirubin_direct" placeholder="Enter result" step="any" id="id_bilirubin_direct">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_vitamin_b12">Vitamin B12:</label>
+                    pg/mL
+                    <input type="number" name="vitamin_b12" min="0" class="input-field-blood" name="vitamin_b12" placeholder="Enter result" step="any" id="id_vitamin_b12">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_gamma_gpt">Gamma-GT (Gamma-Glutamyltransferase):</label>
+                    U/L
+                    <input type="number" name="gamma_gpt" min="0" class="input-field-blood" name="gamma_gpt" placeholder="Enter result" step="any" id="id_gamma_gpt">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_gamma_globulin">Gamma-Globulin:</label>
+                    g/L
+                    <input type="number" name="gamma_globulin" min="0" class="input-field-blood" name="gamma_globulin" placeholder="Enter result" step="any" id="id_gamma_globulin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_hemoglobin_glik">Glycated Hemoglobin:</label>
+                    %
+                    <input type="number" name="hemoglobin_glik" min="0" class="input-field-blood" name="hemoglobin_glik" placeholder="Enter result" max="100" step="any" id="id_hemoglobin_glik">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_sugar">Glucose:</label>
+                    mmol/L
+                    <input type="number" name="sugar" min="0" class="input-field-blood" name="sugar" placeholder="Enter result" step="any" id="id_sugar">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_homocysteine">Homocysteine:</label>
+                    µmol/L
+                    <input type="number" name="homocysteine" min="0" class="input-field-blood" name="homocysteine" placeholder="Enter result" step="any" id="id_homocysteine">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_iron">Iron:</label>
+                    µmol/L
+                    <input type="number" name="iron" min="0" class="input-field-blood" name="iron" placeholder="Enter result" step="any" id="id_iron">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_bile_acids">Bile Acids:</label>
+                    µmol/L
+                    <input type="number" name="bile_acids" min="0" class="input-field-blood" name="bile_acids" placeholder="Enter result" step="any" id="id_bile_acids">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_potassium">Potassium:</label>
+                    mmol/L
+                    <input type="number" name="potassium" min="0" class="input-field-blood" name="potassium" placeholder="Enter result" step="any" id="id_potassium">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_total_calcium">Total Calcium:</label>
+                    mmol/L
+                    <input type="number" name="total_calcium" min="0" class="input-field-blood" name="total_calcium" placeholder="Enter result" step="any" id="id_total_calcium">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_atherogenic_index">Atherogenic Index (AI):</label>
+                    <input type="number" name="atherogenic_index" min="0" class="input-field-blood" name="atherogenic_index" placeholder="Enter result" step="any" id="id_atherogenic_index">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_creatinine">Creatinine:</label>
+                    µmol/L
+                    <input type="number" name="creatinine" min="0" class="input-field-blood" name="creatinine" placeholder="Enter result" step="any" id="id_creatinine">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_creatine_kinase">Creatine Kinase (CK):</label>
+                    U/L
+                    <input type="number" name="creatine_kinase" min="0" class="input-field-blood" name="creatine_kinase" placeholder="Enter result" step="any" id="id_creatine_kinase">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_lactate">Lactate:</label>
+                    mmol/L
+                    <input type="number" name="lactate" min="0" class="input-field-blood" name="lactate" placeholder="Enter result" step="any" id="id_lactate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_lactate_dehydrogenase">Lactate Dehydrogenase (LDH):</label>
+                    U/L
+                    <input type="number" name="lactate_dehydrogenase" min="0" class="input-field-blood" name="lactate_dehydrogenase" placeholder="Enter result" step="any" id="id_lactate_dehydrogenase">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_serum_iron_binding_capacity">Serum Iron Binding Capacity:</label>
+                    µmol/L
+                    <input type="number" name="serum_iron_binding_capacity" min="0" class="input-field-blood" name="serum_iron_binding_capacity" placeholder="Enter result" step="any" id="id_serum_iron_binding_capacity">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_lipase">Lipase:</label>
+                    U/L
+                    <input type="number" name="lipase" min="0" class="input-field-blood" name="lipase" placeholder="Enter result" step="any" id="id_lipase">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_magnesium">Magnesium:</label>
+                    mmol/L
+                    <input type="number" name="magnesium" min="0" class="input-field-blood" name="magnesium" placeholder="Enter result" step="any" id="id_magnesium">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_myoglobin">Myoglobin:</label>
+                    µg/L, ng/mL
+                    <input type="number" name="myoglobin" min="0" class="input-field-blood" name="myoglobin" placeholder="Enter result" step="any" id="id_myoglobin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_uric_acid">Uric Acid:</label>
+                    µmol/L
+                    <input type="number" name="uric_acid" min="0" class="input-field-blood" name="uric_acid" placeholder="Enter result" step="any" id="id_uric_acid">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_urea">Urea:</label>
+                    mmol/L
+                    <input type="number" name="urea" min="0" class="input-field-blood" name="urea" placeholder="Enter result" step="any" id="id_urea">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_sodium">Sodium:</label>
+                    mmol/L
+                    <input type="number" name="sodium" min="0" class="input-field-blood" name="sodium" placeholder="Enter result" step="any" id="id_sodium">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_c-reactive_protein">C-Reactive Protein (CRP):</label>
+                    mg/L
+                    <input type="number" name="c-reactive_protein" min="0" class="input-field-blood" name="c-reactive_protein" placeholder="Enter result" step="any" id="id_c-reactive_protein">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_transferrin">Transferrin:</label>
+                    g/L
+                    <input type="number" name="transferrin" min="0" class="input-field-blood" name="transferrin" placeholder="Enter result" step="any" id="id_transferrin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_triglycerides">Triglycerides:</label>
+                    mmol/L
+                    <input type="number" name="triglycerides" min="0" class="input-field-blood" name="triglycerides" placeholder="Enter result" step="any" id="id_triglycerides">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_ferritin">Ferritin:</label>
+                    µg/L, ng/mL
+                    <input type="number" name="ferritin" min="0" class="input-field-blood" name="ferritin" placeholder="Enter result" step="any" id="id_ferritin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_folic_acid">Folic Acid:</label>
+                    ng/mL
+                    <input type="number" name="folic_acid" min="0" class="input-field-blood" name="folic_acid" placeholder="Enter result" step="any" id="id_folic_acid">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_phosphorus">Phosphorus:</label>
+                    mmol/L
+                    <input type="number" name="phosphorus" min="0" class="input-field-blood" name="phosphorus" placeholder="Enter result" step="any" id="id_phosphorus">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_fructosamine">Fructosamine:</label>
+                    µmol/L
+                    <input type="number" name="fructosamine" min="0" class="input-field-blood" name="fructosamine" placeholder="Enter result" step="any" id="id_fructosamine">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_chlorine">Chlorine:</label>
+                    mmol/L
+                    <input type="number" name="chlorine" min="0" class="input-field-blood" name="chlorine" placeholder="Enter result" step="any" id="id_chlorine">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_total_cholesterol">Total Cholesterol (H):</label>
+                    mmol/L
+                    <input type="number" name="total_cholesterol" min="0" class="input-field-blood" name="total_cholesterol" placeholder="Enter result" step="any" id="id_total_cholesterol">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_hdl_cholesterol">HDL Cholesterol (High-Density Lipoproteins, 'Good Cholesterol', 'Good Cholesterol'):</label>
+                    mmol/L
+                    <input type="number" name="hdl_cholesterol" min="0" class="input-field-blood" name="hdl_cholesterol" placeholder="Enter result" step="any" id="id_hdl_cholesterol">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_ldl_cholesterol">LDL Cholesterol (Low-Density Lipoproteins, 'Bad Cholesterol', 'Bad Cholesterol'):</label>
+                    mmol/L
+                    <input type="number" name="ldl_cholesterol" min="0" class="input-field-blood" name="ldl_cholesterol" placeholder="Enter result" step="any" id="id_ldl_cholesterol">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_cholinesterase">Cholinesterase:</label>
+                    U/L
+                    <input type="number" name="cholinesterase" min="0" class="input-field-blood" name="cholinesterase" placeholder="Enter result" step="any" id="id_cholinesterase">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_alkaline_phosphatase">Alkaline Phosphatase:</label>
+                    U/L
+                    <input type="number" name="alkaline_phosphatase" min="0" class="input-field-blood" name="alkaline_phosphatase" placeholder="Enter result" step="any" id="id_alkaline_phosphatase">
+                </div>
+
+                {% if messages %}
+                {% for message in messages %}
+                <div class="error-message">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+
+                <div class="navigation-buttons">
+                    <a class="backbutton" onclick="submitForm('{% url 'blood' %}')">← Back</a>
+                    <button class="button" type="button" onclick="submitForm('{% url 'extra' %}')">Next</button>
+                </div>
+                <div id="captcha-error" class="error-message" style="color: red; display: none;">
+                    Please fill out the captcha.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer-header">
+        <div class="footer">
+            <div style="margin-bottom: 20px;">
+                <a href="javascript:void(0);" onclick="showContactModal()">Contact</a>
+            </div>
+            <div>&copy; 2023 sm-ds-dr. All rights reserved.</div>
+        </div>
+    </div>
+
+    <div class="overlay">
+        <div class="modal">
+            <h2>Start a New Diagnosis?</h2>
+            <p>You will need to answer the questions again.</p>
+            <div class="modal-buttons">
+                <a style="cursor: pointer;" onclick="closeModal()">Cancel</a>
+                <button onclick="closeModal(); startNewDiagnosis()">Yes, Start a New Diagnosis</button>
+            </div>
+        </div>
+    </div>
+    <div class="overlay overlay-contact">
+        <div class="modal">
+            <span class="close-button" onclick="closeContactModal()">&#10006;</span>
+            <h2>Contact Information</h2>
+            <p>You can place contact information here:</p>
+            <!-- Add contact information here -->
+        </div>
+    </div>
+    <script src="{% static 'js/script.js' %}"></script>
+    <script>
+
+        document.getElementById("current-language").addEventListener("click", function () {
+            var languageDropdown = document.getElementById("language-dropdown");
+            if (languageDropdown.style.display === "block") {
+                languageDropdown.style.display = "none";
+            } else {
+                languageDropdown.style.display = 'block';
+            }
+        });
+
+        function saveFormData() {
+            // Получите данные из полей формы
+            var formData = {};
+
+            // Пример: сохранение значения поля "protein"
+            var formElements = document.querySelectorAll('form input');
+            formElements.forEach(function (element) {
+                formData[element.name] = element.value;
+            });
+
+            // Сохраняем данные в localStorage
+            localStorage.setItem("Chem", JSON.stringify(formData));
+
+            // Выводим данные в консоль после сохранения
+            console.log("Данные после сохранения:", formData);
+        }
+
+        function submitForm(url) {
+            var form = document.getElementById('form');
+
+            // Создайте объект для AJAX-запроса
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', form.action, true);
+
+            // Установите обработчик события для завершения запроса
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Обработка успешного ответа от сервера
+                    saveFormData();
+                    if (url != 'data') {
+                        // Перенаправьте пользователя на указанную страницу
+                        window.location.href = url;
+                    }
+                }
+            };
+
+            // Отправьте форму с использованием AJAX
+            xhr.send(new FormData(form));
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            restoreFormData();
+
+            function restoreFormData() {
+                var savedData = localStorage.getItem('Chem');
+
+                if (savedData) {
+                    var formData = JSON.parse(savedData);
+
+                    // Получите все поля формы
+                    var formFields = document.querySelectorAll('.input-field-blood');
+
+                    // Переберите поля и установите значения из formData
+                    formFields.forEach(function (field) {
+                        var fieldName = field.getAttribute('name');
+                        if (formData.hasOwnProperty(fieldName)) {
+                            field.value = formData[fieldName];
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

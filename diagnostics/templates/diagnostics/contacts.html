@@ -1,0 +1,174 @@
+{% extends 'diagnostics/base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'general' %}'">Общие сведения</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'complaints' %}'">Жалобы</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'disease' %}'">Давность заболевания</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'medicines' %}'">Принимаемые лекарства</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'illnesses' %}'">Ранее перенесённые заболевания
+      </div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'operations' %}'">Ранее перенесённые операции
+      </div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'drug' %}'">Аллергия на лекарства</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'food' %}'">Аллергия на продукты питания и другие
+        вещества</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'habits' %}'">Вредные привычки</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'profession' %}'">Профессия</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'blood' %}'">Общий анализ крови</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'chem' %}'">Биохимический анализ крови</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'extra' %}'">Врач, процедура</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'data' %}'">Введенные данные</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'loading' %}'">Результат диагностики</div>
+      <div class="sidebar-item" onclick="saveFormData(); window.location.href='{% url 'contacts' %}'"><b>Выбранный врач</b></div>
+    </div>
+    <div class="content">
+      <form id="form" action='{% url "contacts" %}' method="post">
+        {% csrf_token %}
+        <div class="contact-section">
+          <h2>Связаться с врачом</h2>
+          <p><b>{{ name.1|title }} свяжется с Вами после принятия «Порядка оказания консультаций», напишите каким
+              способом с Вами можно связаться и отправьте специалисту.</b></p>
+
+          <div style="display: flex; align-items: center;">
+            <input style="margin: 10px;" type="checkbox" id="acceptRules" name="acceptRules">
+            <label for="acceptRules">Я прочитал(а) и принимаю <a href="#" onclick="showConsult()">Порядок оказания консультаций.</a></label>
+          </div>
+          
+          <div class="contact-options">
+
+            <div class="data-summary">
+              <p><b>(одно из полей должно быть заполнено)*</b></p>
+              <div class="form-group">
+                <div class="form-group">
+                  <label for="whatsApp">WhatsApp:</label>
+                  <input type="number" name="whatsApp" class="form-input" id="whatsApp" name="whatsApp">
+                </div>
+              
+                <div class="form-group">
+                  <label for="telegram">Telegram:</label>
+                  <input type="number" name="telegram" class="form-input" id="telegram" name="telegram">
+                </div>
+              </div>
+            </div>
+
+            <div class="data-summary">
+              <div class="form-group">
+                <label for="phone">Телефон:</label>
+                <input type="number" name="phone" class="form-input" id="phone" name="phone">
+              </div>
+            </div>
+
+            <div class="data-summary">
+              <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="text" name="email" class="form-input" id="email" name="email" required>
+              </div>
+            </div>
+
+            <!-- {% for field in form %}
+            {% if forloop.counter == 3 or forloop.counter == 4 %}
+              <hr style="height: 2px; background-color: black;">
+            {% endif %}
+            <div class="form-group">
+              {{ field.label_tag }}
+              {{ field }}
+            </div>
+            {% endfor %} -->
+
+          </div>
+        </div>
+
+        <div class="navigation-buttons">
+          <a class="backbutton" onclick="saveFormData(); window.location.href='{% url 'loading' %}'">← Назад</a>
+          {% if name.4 == 'cons1' %}
+            <button class="button" type="button" onclick="submitForm('{% url 'send_message' %}')">Оплатить и отправить специалисту</button>
+          {% else %}
+            <button class="button" type="button" onclick="submitForm('{% url 'send_message' %}')">Отправить специалисту</button>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    function saveFormData() {
+      // Получите данные из полей формы
+      var formData = {};
+
+      // Пример: сохранение значения поля "protein"
+      var formElements = document.querySelectorAll('form input');
+      formElements.forEach(function (element) {
+        formData[element.name] = element.value;
+      });
+      var checkbox = document.querySelector('input[name="acceptRules"]');
+      formData.acceptRules = checkbox.checked;
+
+      // Сохраняем данные в localStorage
+      localStorage.setItem("Contacts", JSON.stringify(formData));
+      // Выводим данные в консоль после сохранения
+      console.log("Данные после сохранения:", formData)
+    }
+
+    function submitForm(url) {
+      var form = document.getElementById('form');
+
+      // Создайте объект для AJAX-запроса
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', form.action, true);
+
+      // Установите обработчик события для завершения запроса
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          // Обработка успешного ответа от сервера
+          saveFormData();
+          if (url != 'data') {
+            // Перенаправьте пользователя на указанную страницу
+            window.location.href = url;
+          }
+        }
+      };
+
+      var acceptRulesCheckbox = document.getElementById('acceptRules');
+      var messagingFields = ['whatsApp', 'telegram'];
+      var messagingFieldFilled = messagingFields.some(function (field) {
+        return document.getElementById(field).value.trim() !== '';
+      });
+
+      if (acceptRulesCheckbox.checked && messagingFieldFilled) {
+        xhr.send(new FormData(form));
+      } else {
+        alert("Пожалуйста, отметьте правила и заполните хотя бы одно из полей для контакта (WhatsApp или Telegram).");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      restoreFormData();
+
+      function restoreFormData() {
+        var savedData = localStorage.getItem('Contacts');
+        console.log(savedData)
+        if (savedData) {
+          var formData = JSON.parse(savedData);
+
+          // Получите все поля формы
+          var formFields = document.querySelectorAll('form input');
+          var checkbox = document.querySelector('input[name="acceptRules"]');
+          // alert(isPregnancyCheckbox);
+          
+          // Переберите поля и установите значения из formData
+          formFields.forEach(function (field) {
+            var fieldName = field.getAttribute('name');
+            if (formData.hasOwnProperty(fieldName)) {
+              field.value = formData[fieldName];
+            }
+          });
+          checkbox.checked = false;
+        }
+      }
+    });
+  </script>
+{% endblock %}

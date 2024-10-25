@@ -1,0 +1,127 @@
+{% extends 'diagnostics/base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="submitForm('{% url 'general' %}')">Общие сведения</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'complaints' %}')">Жалобы</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'disease' %}')">Давность заболевания</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'medicines' %}')">Принимаемые лекарства</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'illnesses' %}')">Ранее перенесённые заболевания</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'operations' %}')">Ранее перенесённые операции</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'drug' %}')">Аллергия на лекарства</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'food' %}')">Аллергия на продукты питания и другие вещества
+      </div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'habits' %}')">Вредные привычки</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'profession' %}')">Профессия</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'blood' %}')">Общий анализ крови</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'chem' %}')">Биохимический анализ крови</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'extra' %}')"><b>Какой специалист нужен</b></div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'data' %}')">Введенные данные</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'loading' %}')">Результат диагностики</div>
+      {% if doctor %}
+        <div class="sidebar-item" onclick="submitForm('{% url 'success' %}')">Выбранный врач</div>
+      {% else %}
+        <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'loading' %}')">Выбранный врач</div>
+      {% endif %}
+    </div>
+    <div class="content">
+      <form id="form" class="form-section" action="{% url 'extra' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Укажите название специальности, диагноз, состояние, процедуру или операцию, которую
+            выполняет или консультирует нужный Вам специалист</label>
+          {{ form.input }}
+        </div>
+        <div class="form-group">
+          <div style="margin-bottom: 20px;"><b>Выберите язык(и) общения со специалистом:</b></div>
+          {% for checkbox in form.languages %}
+          <div class="form-group">
+            {{ checkbox.tag }}
+            {{ checkbox.choice_label }}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="navigation-buttons">
+          <a class="backbutton" onclick="submitForm('{% url 'chem' %}')">← Назад</a>
+          <button class="button" type="submit" onclick="submitForm('{% url 'captcha' 'data' %}')">Далее</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    function saveFormData() {
+      // Получите данные из полей формы
+      var formData = {};
+
+      // Выберите все элементы формы, включая текстовые поля и чекбоксы
+      var formElements = document.querySelectorAll('form input, form textarea, form select');
+
+      formElements.forEach(function (element) {
+        if (element.type === 'checkbox') {
+          // Для чекбоксов, сохраняем значение true/false вместо 'on'/'off'
+          formData[element.id] = element.checked;
+        } else {
+          formData[element.id] = element.value;
+        }
+      });
+
+      // Сохраняем данные в localStorage
+      localStorage.setItem("Extra", JSON.stringify(formData));
+
+      // Выводим данные в консоль после сохранения
+      console.log("Данные после сохранения:", formData);
+    }
+
+    function submitForm(url) {
+      var form = document.getElementById('form');
+
+      // Создайте объект для AJAX-запроса
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', form.action, true);
+
+
+      // Отправьте форму с использованием AJAX
+      xhr.send(new FormData(form));
+
+      // Установите обработчик события для завершения запроса
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          // Обработка успешного ответа от сервера
+          // Перенаправьте пользователя на указанную страницу
+          window.location.href = url;
+        }
+      };
+      saveFormData()
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      restoreFormData();
+      function restoreFormData() {
+        var savedData = localStorage.getItem('Extra');
+        if (savedData) {
+          var formData = JSON.parse(savedData);
+
+          // Получите все поля формы, которые должны быть восстановлены
+          var formFields = document.querySelectorAll('form input, form textarea, form select');
+
+          formFields.forEach(function (field) {
+            var fieldId = field.getAttribute('id');
+            if (formData.hasOwnProperty(fieldId)) {
+              if (field.type == 'checkbox') {
+                // Если это чекбокс, установите его состояние
+                field.checked = formData[fieldId];
+              } else {
+                // В противном случае, установите значение поля
+                field.value = formData[fieldId];
+              }
+            }
+          });
+        }
+      }
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,326 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Status Diagnosis</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-title" onclick="showModal()">sm-ds-dr<br><span
+                    style="font-size: 18px;">(symptoms-diagnosis-doctor)</span></div>
+            <div class="language">
+                <span id="current-language">English</span>
+                <div id="language-dropdown" style="display: none" class="language-dropdown">
+                    <ul>
+                        <li><a href="{% url 'set_language' 'ru' %}">Русский</a></li>
+                        <li><a href="{% url 'set_language' 'en' %}">English</a></li>
+                        <!-- Добавьте другие языки, если необходимо -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-item" onclick="submitForm('{% url 'general' %}')">General Information</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'complaints' %}')">Complaints</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'disease' %}')">Duration of Illness</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'medicines' %}')">Medications Taken</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'illnesses' %}')">Previous Illnesses</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'operations' %}')">Previous Operations</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'drug' %}')">Drug Allergies</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'food' %}')">Food and Other Allergies</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'habits' %}')">Harmful Habits</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'blood' %}')"><b>Complete Blood Count</b></div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'chem' %}')">Biochemical Blood Analysis</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'extra' %}')">Which Specialist is Needed</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'data' %}')">Entered Data</div>
+            <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'loading' %}')">Diagnosis Results</div>
+        </div>
+        <div class="content">
+            <form id="form" class="form-section" action="{% url 'blood' %}" method="post">
+                {% csrf_token %}
+                <div class="section-title">Complete Blood Count (CBC)</div>
+
+                <div class="form-group">
+                    <label for="id_erythrocytes">Erythrocytes (RBC):</label>
+                    10^12 cells/L, 10^6 cells/µL, cells/µL
+                    <input type="number" name="erythrocytes" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_erythrocytes">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_hemoglobin">Hemoglobin (HGB):</label>
+                    g/L, g/dL
+                    <input type="number" name="hemoglobin" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_hemoglobin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_leukocytes">Leukocytes (WBC):</label>
+                    10^9 cells/L, 10^3 cells/µL, cells/µL
+                    <input type="number" name="leukocytes" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_leukocytes">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_platelets">Platelets (PLT):</label>
+                    10^9 cells/L, 10^3 cells/µL, cells/µL
+                    <input type="number" name="platelets" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_platelets">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_hematocrit">Hematocrit (HCT):</label>
+                    %, L/L
+                    <input type="number" name="hematocrit" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_hematocrit">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_soe">ESR (Erythrocyte Sedimentation Rate):</label>
+                    mm/h
+                    <input type="number" name="soe" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_soe">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_color_indicator">Color Indicator:</label>
+                    <input type="number" name="color_indicator" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_color_indicator">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_mean_erytr_volume">Mean Corpuscular Volume (MCV):</label>
+                    fL
+                    <input type="number" name="mean_erytr_volume" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_mean_erytr_volume">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_distr_erytr_volume_variation">Red Cell Distribution Width (RDW-CV):</label>
+                    %
+                    <input type="number" name="distr_erytr_volume_variation" min="0" class="input-field-blood" placeholder="Enter result" max="100" step="any" id="id_distr_erytr_volume_variation">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_distr_ertyr_volume_standart_devi">Red Cell Distribution Width (RDW-SD):</label>
+                    <input type="number" name="distr_ertyr_volume_standart_devi" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_distr_ertyr_volume_standart_devi">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_distr_platelets_volume">Platelet Distribution Width (PDW):</label>
+                    <input type="number" name="distr_platelets_volume" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_distr_platelets_volume">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_mean_platelets_volume">Mean Platelet Volume (MPV):</label>
+                    fL
+                    <input type="number" name="mean_platelets_volume" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_mean_platelets_volume">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_big_eryrt_coeff">Platelet Larger Cell Ratio (P-LCR):</label>
+                    %
+                    <input type="number" name="big_eryrt_coeff" min="0" class="input-field-blood" placeholder="Enter result" max="100" step="any" id="id_big_eryrt_coeff">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_mean_hemoglobin_in_erytr">Mean Hemoglobin Concentration (MCH):</label>
+                    pg
+                    <input type="number" name="mean_hemoglobin_in_erytr" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_mean_hemoglobin_in_erytr">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_mean_concentration_hemoglobin_in_eryrts">Mean Corpuscular Hemoglobin Concentration (MCHC):</label>
+                    g/L, g/dL
+                    <input type="number" name="mean_concentration_hemoglobin_in_eryrts" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_mean_concentration_hemoglobin_in_eryrts">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_basophils">Basophils (BA, BAS):</label>
+                    10^9 cells/L, 10^3 cells/µL, cells/µL
+                    <input type="number" name="basophils" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_basophils">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_basophils_procent">Basophils (BA, BAS), %:</label>
+                    %
+                    <input type="number" name="basophils_procent" min="0" class="input-field-blood" placeholder="Enter result" max="100" step="any" id="id_basophils_procent">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_eosinophils">Eosinophils (EO):</label>
+                    10^9 cells/L, 10^3 cells/µL, cells/µL
+                    <input type="number" name="eosinophils" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_eosinophils">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_eosinophils_procent">Eosinophils (EO), %:</label>
+                    %
+                    <input type="number" name="eosinophils_procent" min="0" class="input-field-blood" placeholder="Enter result" max="100" step="any" id="id_eosinophils_procent">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_neutrophils">Neutrophils (NE, NEUT):</label>
+                    10^9 cells/L, 10^3 cells/µL, cells/µL
+                    <input type="number" name="neutrophils" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_neutrophils">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_neutrophils_procent">Neutrophils (NE, NEUT), %:</label>
+                    %
+                    <input type="number" name="neutrophils_procent" min="0" class="input-field-blood" placeholder="Enter result" max="100" step="any" id="id_neutrophils_procent">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_neutrophils_stick">Neutrophils (Band Neutrophils):</label>
+                    %
+                    <input type="number" name="neutrophils_stick" min="0" class="input-field-blood" placeholder="Enter result" max="100" step="any" id="id_neutrophils_stick">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_neutrophils_segment">Neutrophils (Segmented Neutrophils):</label>
+                    %
+                    <input type="number" name="neutrophils_segment" min="0" class="input-field-blood" placeholder="Enter result" max="100" step="any" id="id_neutrophils_segment">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_lymphocytes">Lymphocytes (LY, LYM):</label>
+                    10^9 cells/L, 10^3 cells/µL, cells/µL
+                    <input type="number" name="lymphocytes" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_lymphocytes">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_lymphocytes_procent">Lymphocytes (LY, LYM), %:</label>
+                    %
+                    <input type="number" name="lymphocytes_procent" min="0" class="input-field-blood" placeholder="Enter result" max="100" step="any" id="id_lymphocytes_procent">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_monocytes">Monocytes (MO, MON):</label>
+                    10^9 cells/L, 10^3 cells/µL, cells/µL
+                    <input type="number" name="monocytes" min="0" class="input-field-blood" placeholder="Enter result" step="any" id="id_monocytes">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_monocytes_procent">Monocytes (MO, MON), %:</label>
+                    %
+                    <input type="number" name="monocytes_procent" min="0" class="input-field-blood" placeholder="Enter result" max="100" step="any" id="id_monocytes_procent">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_trombocrit">Thrombocrit (PCT):</label>
+                    %
+                    <input type="number" name="trombocrit" min="0" class="input-field-blood" placeholder="Enter result" max="100" step="any" id="id_trombocrit">
+                </div>
+                
+
+                <div class="navigation-buttons">
+                    <a class="backbutton" onclick="submitForm('{% url 'habits' %}')">← Back</a>
+                    <button class="button" type="submit" onclick="submitForm('{% url 'chem' %}')">Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="footer-header">
+        <div class="footer">
+            <div style="margin-bottom: 20px;">
+                <a href="javascript:void(0);" onclick="showContactModal()">Contact</a>
+            </div>
+            <div>&copy; 2023 sm-ds-dr. All rights reserved.</div>
+        </div>
+    </div>
+
+    <div class="overlay">
+        <div class="modal">
+            <h2>Start a New Diagnosis?</h2>
+            <p>You will need to answer the questions again.</p>
+            <div class="modal-buttons">
+                <a style="cursor: pointer;" onclick="closeModal()">Cancel</a>
+                <button onclick="closeModal(); startNewDiagnosis()">Yes, Start a New Diagnosis</button>
+            </div>
+        </div>
+    </div>
+    <div class="overlay overlay-contact">
+        <div class="modal">
+            <span class="close-button" onclick="closeContactModal()">&#10006;</span>
+            <h2>Contact Information</h2>
+            <p>You can place contact information here:</p>
+            <!-- Add contact information here -->
+        </div>
+    </div>
+    <script src="{% static 'js/script.js' %}"></script>
+    <script>
+
+        document.getElementById("current-language").addEventListener("click", function () {
+            var languageDropdown = document.getElementById("language-dropdown");
+            if (languageDropdown.style.display === "block") {
+                languageDropdown.style.display = "none";
+            } else {
+                languageDropdown.style.display = 'block';
+            }
+        });
+
+        function saveFormData() {
+            // Получите данные из полей формы
+            var formData = {};
+
+            // Пример: сохранение значения поля "protein"
+            var formElements = document.querySelectorAll('form input');
+            formElements.forEach(function (element) {
+                formData[element.name] = element.value;
+            });
+
+            // Сохраняем данные в localStorage
+            localStorage.setItem("Blood", JSON.stringify(formData));
+
+            // Выводим данные в консоль после сохранения
+            console.log("Данные после сохранения:", formData);
+        }
+
+        function submitForm(url) {
+            var form = document.getElementById('form');
+
+            // Создайте объект для AJAX-запроса
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', form.action, true);
+
+
+            // Отправьте форму с использованием AJAX
+            xhr.send(new FormData(form));
+
+            // Установите обработчик события для завершения запроса
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Обработка успешного ответа от сервера
+                    // Перенаправьте пользователя на указанную страницу
+                    window.location.href = url;
+                }
+            };
+            saveFormData()
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            restoreFormData();
+            function restoreFormData() {
+                var savedData = localStorage.getItem('Blood');
+                if (savedData) {
+                    var formData = JSON.parse(savedData);
+
+                    // Получите все поля формы
+                    var formFields = document.querySelectorAll('.input-field-blood');
+
+                    // Переберите поля и установите значения из formData
+                    formFields.forEach(function (field) {
+                        var fieldName = field.getAttribute('name');
+                        if (formData.hasOwnProperty(fieldName)) {
+                            field.value = formData[fieldName];
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

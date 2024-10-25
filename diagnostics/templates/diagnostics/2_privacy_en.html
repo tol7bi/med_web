@@ -1,0 +1,118 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Use and Agreement</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+  <style>
+
+    .checkbox-list {
+      margin-bottom: 10px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="header-content">
+      <div class="header-title">sm-ds-dr<br><span style="font-size: 18px;">(symptoms-diagnosis-doctor)</span></div>
+      <div class="language">
+        <span id="current-language">English</span>
+        <div id="language-dropdown" style="display: none" class="language-dropdown">
+          <ul>
+            <li><a href="{% url 'set_language' 'ru' %}">Русский</a></li>
+            <li><a href="{% url 'set_language' 'en' %}">English</a></li>
+            <!-- Добавьте другие языки, если необходимо -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="window.location.href='{% url 'index' %}'">About the Project</div>
+      <div class="sidebar-item" onclick="window.location.href='{% url 'privacy' %}'"><b>Terms of Use</b></div>
+    </div>
+    <div class="main-content">
+      <div class="title-text">Terms of Use</div>
+      <div class="info-text">
+        Before starting the diagnosis, please read and accept the Terms of Use of the service. This examination is not a
+        full-fledged medical diagnosis. It is intended for general information and finding the most suitable doctors. This
+        examination is not intended for emergencies. In case of an emergency, please call emergency services immediately.
+      </div>
+      <form action="{% url 'privacy' %}" method="post">
+        {% csrf_token %}
+        <div class="checkbox-list">
+          <div class="checkbox-item">
+            <input type="checkbox" id="terms" required>
+            <label for="terms">I have read and accept the Terms of Use</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="infoUsage" required>
+            <label for="infoUsage">I agree to the use of the provided information for this diagnosis.</label>
+          </div>
+        </div>
+        <div class="navigation-buttons">
+          <a class="backbutton" onclick="window.location.href='{% url 'index' %}'">← Back</a>
+          <button class="button" type="submit" id="privacy">
+            Next
+          </button>
+        </div>
+      </form>
+      <div class="privacy-policy">
+        Additional information is provided in the <a href="#">Privacy Policy</a>.
+      </div>
+    </div>
+  </div>
+  <div class="footer-header">
+    <div class="footer">
+      <div style="margin-bottom: 20px;">
+        <a href="javascript:void(0);" onclick="showContactModal()">Contacts</a>
+      </div>
+      <div>&copy; 2023 sm-ds-dr. All rights reserved.</div>
+    </div>
+  </div>
+  <div class="overlay overlay-contact">
+    <div class="modal">
+      <span class="close-button" onclick="closeContactModal()">&#10006;</span>
+      <h2>Contacts</h2>
+      <p>You can place contact information here:</p>
+      <!-- Add contact information here -->
+    </div>
+  </div>
+  <script src="{% static 'js/script.js' %}"></script>
+  <script>
+    // JavaScript для отображения и скрытия выпадающего списка
+    var languageDropdown = document.getElementById("language-dropdown");
+
+    document.getElementById("current-language").addEventListener("click", function () {
+      console.log(11);
+      if (languageDropdown.style.display === "block") {
+        languageDropdown.style.display = "none";
+      } else {
+        languageDropdown.style.display = 'block';
+      }
+    });
+
+    // // Закрываем выпадающий список, если кликнули вне него
+    // document.addEventListener("click", function (event) {
+    //   if (!languageDropdown.contains(event.target)) {
+    //     languageDropdown.style.display = "none";
+    //   }
+    // });
+
+  </script>
+</body>
+
+</html>

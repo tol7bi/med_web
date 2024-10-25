@@ -1,0 +1,163 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complaints</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+  <div class="header">
+    <div class="header-content">
+      <div class="header-title" onclick="showModal()">sm-ds-dr<br><span
+          style="font-size: 18px;">(symptoms-diagnosis-doctor)</span></div>
+      <div class="language">
+        <span id="current-language">English</span>
+        <div id="language-dropdown" style="display: none" class="language-dropdown">
+          <ul>
+            <li><a href="{% url 'set_language' 'ru' %}">Русский</a></li>
+            <li><a href="{% url 'set_language' 'en' %}">English</a></li>
+            <!-- Add other languages if needed -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="submitForm('{% url 'general' %}')">General Information</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'complaints' %}')"><b>Complaints</b></div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'disease' %}')">Duration of Illness</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'medicines' %}')">Medications Taken</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'illnesses' %}')">Previous Illnesses</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'operations' %}')">Previous Operations</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'drug' %}')">Drug Allergies</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'food' %}')">Food and Other Allergies</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'habits' %}')">Harmful Habits</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'blood' %}')">Complete Blood Count</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'chem' %}')">Biochemical Blood Analysis</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'extra' %}')">Which Specialist is Needed</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'data' %}')">Entered Data</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'loading' %}')">Diagnosis Results</div>
+    </div>
+    <div class="content">
+      <div class="section-title">Complaints</div>
+      <form id="form" action='{% url "complaints" %}' method="post">
+        {% csrf_token %}
+        <div class="selected-options" id="selectedOptions"></div>
+        <div>
+          <input class="form-input" type="text" id="complaintInput" name="complaints" placeholder="Enter complaints"
+            oninput="showAutocomplete()">
+          <div id="autocompleteList" style="display: none;"></div>
+        </div>
+        <button type="button" class="button" style="margin-top: 10px;" onclick="addOptionButton()">Add Option</button>
+
+        <div class="navigation-buttons">
+          <a class="backbutton" onclick="submitForm('{% url 'general' %}')">← Back</a>
+          <button class="button" type="submit" onclick="saveFormData()">Next</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="footer-header">
+    <div class="footer">
+      <div style="margin-bottom: 20px;">
+        <a href="javascript:void(0);" onclick="showContactModal()">Contact</a>
+      </div>
+      <div>&copy; 2023 sm-ds-dr. All rights reserved.</div>
+    </div>
+  </div>
+
+  <div class="overlay">
+    <div class="modal">
+      <h2>Start a New Diagnosis?</h2>
+      <p>You will need to answer the questions again.</p>
+      <div class="modal-buttons">
+        <a style="cursor: pointer;" onclick="closeModal()">Cancel</a>
+        <button onclick="closeModal(); startNewDiagnosis()">Yes, Start a New Diagnosis</button>
+      </div>
+    </div>
+  </div>
+  <div class="overlay overlay-contact">
+    <div class="modal">
+      <span class="close-button" onclick="closeContactModal()">&#10006;</span>
+      <h2>Contact Information</h2>
+      <p>You can place contact information here:</p>
+      <!-- Add contact information here -->
+    </div>
+  </div>
+  <script src="{% static 'js/script.js' %}"></script>
+  <script>
+
+    document.getElementById("current-language").addEventListener("click", function () {
+      var languageDropdown = document.getElementById("language-dropdown");
+      if (languageDropdown.style.display === "block") {
+        languageDropdown.style.display = "none";
+      } else {
+        languageDropdown.style.display = 'block';
+      }
+    });
+
+    function saveFormData() {
+      // Получите данные из полей формы
+      var complaints = [];
+
+      var selectedOptions = document.querySelectorAll('.selected-option-text');
+      selectedOptions.forEach(function (option) {
+        complaints.push(option.textContent);
+      });
+
+      // Сохраняем данные в localStorage
+      localStorage.setItem("Complaints", JSON.stringify(complaints));
+
+      // Выводим данные в консоль после сохранения
+      console.log("Данные после сохранения:", complaints);
+    }
+
+    function submitForm(url) {
+      var form = document.getElementById('form');
+
+      // Создайте объект для AJAX-запроса
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', form.action, true);
+
+      // Установите обработчик события для завершения запроса
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          // Обработка успешного ответа от сервера
+          saveFormData()
+          // Перенаправьте пользователя на указанную страницу
+          window.location.href = url;
+        }
+      };
+
+      // Отправьте форму с использованием AJAX
+      xhr.send(new FormData(form));
+    }
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+      restoreFormData();
+      function restoreFormData() {
+        var savedData = localStorage.getItem('Complaints');
+        if (savedData) {
+          var complaints = JSON.parse(savedData);
+
+          // Получите элемент, в который будут восстановлены жалобы
+          var selectedOptions = document.getElementById('selectedOptions');
+
+          // Добавьте восстановленные жалобы в элемент
+          complaints.forEach(function (complaint) {
+            addOption(complaint);
+          });
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

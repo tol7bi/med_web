@@ -1,0 +1,118 @@
+{% extends 'diagnostics/base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="submitForm('{% url 'general' %}')">Общие сведения</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'complaints' %}')"><b>Жалобы</b></div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'disease' %}')">Давность заболевания</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'medicines' %}')">Принимаемые лекарства</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'illnesses' %}')">Ранее перенесённые заболевания</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'operations' %}')">Ранее перенесённые операции</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'drug' %}')">Аллергия на лекарства</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'food' %}')">Аллергия на продукты питания и другие вещества
+      </div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'habits' %}')">Вредные привычки</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'profession' %}')">Профессия</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'blood' %}')">Общий анализ крови</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'chem' %}')">Биохимический анализ крови</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'extra' %}')">Врач, процедура</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'data' %}')">Введенные данные</div>
+      <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'loading' %}')">Результат диагностики</div>
+      {% if doctor %}
+        <div class="sidebar-item" onclick="submitForm('{% url 'success' %}')">Выбранный врач</div>
+      {% else %}
+        <div class="sidebar-item" onclick="submitForm('{% url 'captcha' 'loading' %}')">Выбранный врач</div>
+      {% endif %}
+    </div>
+    <div class="content">
+      <div class="section-title">Жалобы</div>
+      <form id="form" action='{% url "complaints" %}' method="post">
+        {% csrf_token %}
+        <div class="selected-options" id="selectedOptions"></div>
+        <div>
+          <input class="form-input" type="text" id="complaintInput" name="complaints" placeholder="Введите жалобы"
+            oninput="showAutocomplete()">
+          <div id="autocompleteList" style="display: none;"></div>
+        </div>
+        <button type="button" class="button" style="margin-top: 10px;" onclick="addOptionButton()">Добавить
+          вариант</button>
+
+        <div class="navigation-buttons">
+          <a class="backbutton" onclick="submitForm('{% url 'general' %}')">← Назад</a>
+          <button class="button" type="submit" onclick="saveFormData()">Далее</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+
+    document.getElementById("current-language").addEventListener("click", function () {
+      var languageDropdown = document.getElementById("language-dropdown");
+      if (languageDropdown.style.display === "block") {
+        languageDropdown.style.display = "none";
+      } else {
+        languageDropdown.style.display = 'block';
+      }
+    });
+
+    function saveFormData() {
+      // Получите данные из полей формы
+      var complaints = [];
+
+      var selectedOptions = document.querySelectorAll('.selected-option-text');
+      selectedOptions.forEach(function (option) {
+        complaints.push(option.textContent);
+      });
+
+      // Сохраняем данные в localStorage
+      localStorage.setItem("Complaints", JSON.stringify(complaints));
+
+      // Выводим данные в консоль после сохранения
+      console.log("Данные после сохранения:", complaints);
+    }
+
+    function submitForm(url) {
+      var form = document.getElementById('form');
+
+      // Создайте объект для AJAX-запроса
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', form.action, true);
+
+      // Установите обработчик события для завершения запроса
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          // Обработка успешного ответа от сервера
+          saveFormData()
+          // Перенаправьте пользователя на указанную страницу
+          window.location.href = url;
+        }
+      };
+
+      // Отправьте форму с использованием AJAX
+      xhr.send(new FormData(form));
+    }
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+      restoreFormData();
+      function restoreFormData() {
+        var savedData = localStorage.getItem('Complaints');
+        if (savedData) {
+          var complaints = JSON.parse(savedData);
+
+          // Получите элемент, в который будут восстановлены жалобы
+          var selectedOptions = document.getElementById('selectedOptions');
+
+          // Добавьте восстановленные жалобы в элемент
+          complaints.forEach(function (complaint) {
+            addOption(complaint);
+          });
+        }
+      }
+    });
+  </script>
+{% endblock %}

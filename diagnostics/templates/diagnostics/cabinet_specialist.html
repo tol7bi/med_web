@@ -1,0 +1,324 @@
+{% extends 'diagnostics/base2.html' %}
+
+{% block style %}
+<style>
+    .form-section {
+        margin-bottom: 20px;
+    }
+
+    .form-section label {
+        display: block;
+        margin-top: 10px;
+    }
+
+    .form-section input[type="text"],
+    .form-section input[type="email"],
+    .form-section input[type="number"],
+    .form-section input[type="date"] {
+        padding: 5px;
+        margin-top: 5px;
+    }
+
+    .form-section .add-language {
+        margin-top: 10px;
+    }
+
+    .form-section .education-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .form-section .education-table th,
+    .form-section .education-table td {
+        border: 1px solid #000;
+        padding: 5px;
+        text-align: left;
+    }
+
+    .no-bold label {
+        font-weight: normal;
+    }
+
+    .logout-link {
+        width: 100%;
+        /* Ширина элемента, чтобы текст мог выравниваться внутри */
+        text-align: right;
+        /* Выравнивание текста по правому краю */
+        font-size: 16px;
+    }
+
+    .remove-row {
+        cursor: pointer;
+        color: red;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="sidebar">
+        <div class="sidebar-item"><b>Общие данные</b></div>
+        <div class="sidebar-item" onclick="submitForm('{% url 'services' %}')">Услуги</div>
+    </div>
+
+    <div class="content">
+        <div class="logout-link">
+            {{ user.email }}<a style="padding: 5px;" href="{% url 'logout' %}">Выйти</a>
+        </div>
+        <h2>Общие данные</h2>
+        <p style="margin: 0;">Данные будут сохранены при клике на кнопку «сохранить»! </p>
+        <p style="margin-top: 0;">Обязательные поля отмечены звездочкой (*).
+        <p>
+        <form id="form" action="{% url 'cabinet_specialist' %}" method="post" onsubmit="return validateForm()">
+            {% csrf_token %}
+            <div class="form-section">
+                {{ form.last_name_or_clinic_name.label_tag }}
+                {{ form.last_name_or_clinic_name }}
+
+                {{ form.first_name_or_clinic_address.label_tag }}
+                {{ form.first_name_or_clinic_address }}
+
+                {{ form.patronymic_or_clinic_hours.label_tag }}
+                {{ form.patronymic_or_clinic_hours }}
+
+                {{ form.gender.label_tag }}
+
+                <div class="radio-group">
+                    {% for radio in form.gender %}
+                    <div class="radio-group no-bold">
+                        {{ radio }}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {{ form.date_of_birth.label_tag }}
+                {{ form.date_of_birth }}
+            </div>
+
+            <div class="form-section">
+                <label>Укажите языки, на которых могут быть предоставлены услуги*:</label>
+                <div class="checkbox-group">
+                    {% for language in form.languages %}
+                    <div class="checkbox no-bold">
+                        {{ language }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {{ form.other_language.label_tag }}
+                {{ form.other_language }}
+            </div>
+
+            <div class="form-section">
+                <p>Пояснение: Указанные контакты (whatsapp, telegram, телефон) для пациентов не публикуются. Они нужны
+                    чтобы Администрация сайта calculhls.com могла с Вами связаться.</p>
+
+                {{ form.whatsapp.label_tag }}
+                {{ form.whatsapp }}
+
+                {{ form.telegram.label_tag }}
+                {{ form.telegram }}
+
+                {{ form.phone.label_tag }}
+                {{ form.phone }}
+
+                {{ form.country.label_tag }}
+                {{ form.country }}
+
+                {{ form.city_or_locality.label_tag }}
+                {{ form.city_or_locality }}
+            </div>
+
+            <div class="form-section">
+                {{ form.computer_analysis.label_tag }}
+                {% for radio in form.computer_analysis %}
+                <div class="radio-group no-bold">
+                    {{ radio }}
+                    {{ radio.label_tag }}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-section">
+                {{ form.currency.label_tag }}
+                {{ form.currency }}
+            </div>
+
+            <div class="form-section">
+                <label>Образование:</label>
+                {{ education_formset.management_form }}
+                <table class="education-table" id="education-table">
+                    <thead>
+                        <tr>
+                            <th>Начало</th>
+                            <th>Окончание</th>
+                            <th>Квалификация, специальность, тема</th>
+                            <th>Учебное заведение</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for education in form_edu %}
+                        <tr class="education-form">
+                            <td>{{ education.start_date }}</td>
+                            <td>{{ education.end_date }}</td>
+                            <td>{{ education.specialty }}</td>
+                            <td>{{ education.institution }}</td>
+                            <td>
+                                <a href="{% url 'delete_education' education.id %}">❌</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                        {% for form in education_formset %}
+                        <tr class="education-form">
+                            <td>{{ form.start_date }}</td>
+                            <td>{{ form.end_date }}</td>
+                            <td>{{ form.specialty }}</td>
+                            <td>{{ form.institution }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="button" onclick="addRow()">добавить</button>
+            </div>
+
+            <div class="form-section">
+                {{ form.academic_degree_or_home_call.label_tag }}
+                {{ form.academic_degree_or_home_call }}
+            </div>
+
+            <button type="button" onclick="submitForm('{% url 'cabinet_specialist' %}')">сохранить</button>
+            <button type="button" onclick="submitForm('{% url 'services' %}')">далее</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+
+    function submitForm(url) {
+        var form = document.getElementById('form');
+
+        if (!form.checkValidity() || !validateForm()) {
+            // Остановите отправку формы, если она невалидна
+            event.preventDefault();
+            form.reportValidity(); // Показывает сообщения об ошибках для невалидных полей
+            return;
+        }
+
+        // Создайте объект для AJAX-запроса
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', form.action, true);
+
+        // Установите обработчик события для завершения запроса
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200 && validateForm()) {
+                // Перенаправьте пользователя на указанную страницу
+                window.location.href = url;
+            }
+        };
+
+        // Отправьте форму с использованием AJAX
+        xhr.send(new FormData(form));
+    }
+
+    function addRow() {
+        const table = document.getElementById("education-table").getElementsByTagName('tbody')[0];
+        const lastRow = table.rows[table.rows.length - 1];
+        const inputs = lastRow.getElementsByTagName("input");
+
+        let allFilled = true;
+        for (let input of inputs) {
+            if (input.value === "") {
+                allFilled = false;
+                input.focus();
+                alert("Please fill all fields before adding a new row.");
+                return;  // Выходим, если хоть одно поле пустое
+            }
+        }
+
+        if (lastRow) {
+            const removeCell = lastRow.insertCell(-1); // Добавляем ячейку в конец
+            const removeButton = document.createElement("span");
+            removeButton.className = "remove-row";
+            removeButton.innerHTML = "❌";
+            removeButton.onclick = function () { removeRow(this); };
+            removeCell.appendChild(removeButton);
+        }
+
+        if (allFilled) {
+            const newRow = table.insertRow();
+            const rowNum = table.rows.length - 1;  // Номер новой строки
+
+            // Добавляем ячейки для новой строки
+            const startCell = newRow.insertCell(0);
+            const startInput = document.createElement("input");
+            startInput.type = "date";
+            startInput.name = `form-${rowNum}-start_date`;
+            startInput.min = "1900-01-01";
+            startInput.max = '2124-08-26';
+            startCell.appendChild(startInput);
+
+            const endCell = newRow.insertCell(1);
+            const endInput = document.createElement("input");
+            endInput.type = "date";
+            endInput.name = `form-${rowNum}-end_date`;
+            endInput.min = "1900-01-01";
+            endInput.max = '2124-08-26';
+            endCell.appendChild(endInput);
+
+            const specialtyCell = newRow.insertCell(2);
+            const specialtyInput = document.createElement("input");
+            specialtyInput.type = "text";
+            specialtyInput.name = `form-${rowNum}-specialty`;
+            specialtyCell.appendChild(specialtyInput);
+
+            const institutionCell = newRow.insertCell(3);
+            const institutionInput = document.createElement("input");
+            institutionInput.type = "text";
+            institutionInput.name = `form-${rowNum}-institution`;
+            institutionCell.appendChild(institutionInput);
+
+            // Обновляем management_form
+            document.getElementById("id_form-TOTAL_FORMS").setAttribute("value", rowNum + 1);
+        }
+    }
+
+    function removeRow(button) {
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+
+        const table = document.getElementById("education-table").getElementsByTagName('tbody')[0];
+        const rowCount = table.rows.length;
+
+        for (let i = 0; i < rowCount; i++) {
+            const row = table.rows[i];
+            row.cells[0].getElementsByTagName('input')[0].name = `form-${i}-start_date`;
+            row.cells[1].getElementsByTagName('input')[0].name = `form-${i}-end_date`;
+            row.cells[2].getElementsByTagName('input')[0].name = `form-${i}-specialty`;
+            row.cells[3].getElementsByTagName('input')[0].name = `form-${i}-institution`;
+        }
+
+        document.getElementById("id_form-TOTAL_FORMS").setAttribute("value", rowCount);
+    }
+
+    function validateForm() {
+        const checkboxes = document.querySelectorAll('input[name="languages"]:checked');
+        const otherLanguage = document.querySelector('input[name="other_language"]').value.trim();
+
+        if (checkboxes.length === 0 && otherLanguage === "") {
+            alert("Пожалуйста, выберите хотя бы один язык или добавьте другой язык.");
+            return false; // предотвращает отправку формы
+        }
+
+        return true; // позволяет отправить форму
+    }
+</script>
+
+
+{% endblock %}
